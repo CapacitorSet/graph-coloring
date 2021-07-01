@@ -1,0 +1,16 @@
+#include <iostream>
+#include "parse/Parser.h"
+
+int main(int argc, char **argv) {
+    if (argc != 2) {
+        std::cerr << "Syntax: " << argv[0] << " <graph>" << std::endl;
+        return 1;
+    }
+    Graph g = Parser(argv[1]).parse();
+    if (g.is_well_colored()) {
+        std::cout << "Graph colored correctly!" << std::endl;
+    } else {
+        std::cout << "The graph was not colored." << std::endl;
+    }
+    return 0;
+}
