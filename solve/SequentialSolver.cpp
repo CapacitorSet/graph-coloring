@@ -28,3 +28,7 @@ void SequentialSolver::solve(Graph &graph) {
         graph.colors[index] = smallest_color;
     }
 }
+
+SequentialSolver::SequentialSolver() {
+    this->name = "SequentialSolver";
+}

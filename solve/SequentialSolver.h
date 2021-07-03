@@ -5,7 +5,7 @@
 
 class SequentialSolver : public Solver {
 public:
-    SequentialSolver() = default;
+    SequentialSolver();
 
     void solve(Graph&);
 };

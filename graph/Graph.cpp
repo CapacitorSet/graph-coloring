@@ -34,3 +34,7 @@ color_t Graph::color_of(uint32_t v) const {
 edges_t Graph::neighbors_of(uint32_t v) const {
     return vertices[v];
 }
+
+void Graph::clear_colors() {
+    std::fill(colors.begin(), colors.end(), 0);
+}
