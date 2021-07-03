@@ -11,11 +11,16 @@ class Graph {
     std::vector<edges_t> vertices;
     std::vector<color_t> colors;
 
+    friend class SequentialSolver;
+
 public:
     Graph(std::vector<edges_t> &&_vertices);
 
     bool is_well_colored() const;
     uint32_t count_colors() const;
+
+    color_t color_of(uint32_t v) const;
+    edges_t neighbors_of(uint32_t v) const;
 };
 
 #endif //GRAPH_COLORING_GRAPH_H

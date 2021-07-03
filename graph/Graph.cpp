@@ -26,3 +26,11 @@ uint32_t Graph::count_colors() const {
     // Construct an unordered set of colors on the fly and return the number of elements in it
     return std::unordered_set<color_t>(this->colors.cbegin(), this->colors.cend()).size();
 }
+
+color_t Graph::color_of(uint32_t v) const {
+    return colors[v];
+}
+
+edges_t Graph::neighbors_of(uint32_t v) const {
+    return vertices[v];
+}
