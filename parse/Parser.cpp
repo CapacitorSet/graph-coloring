@@ -7,13 +7,15 @@ Parser::Parser(const std::string &filename) : file(filename) {
         throw "Failed to open file.";
 }
 
-std::vector<uint32_t> Parser::parse_numbers(const std::string &line) {
+std::vector<uint32_t> Parser::parse_numbers(const std::string &line, bool is_header = false) {
     std::vector<uint32_t> ret;
     std::istringstream line_str(line);
     std::string number_str;
     // std::getline reads line_str up to the next space and writes it into number_str
     while (std::getline(line_str, number_str, ' ')) {
         uint32_t number = std::stoul(number_str);
+        if (!is_header)
+            number -= 1; // In the Metis format, vertices start from 1
         ret.emplace_back(number);
     }
     return ret;
@@ -25,7 +27,7 @@ Graph Parser::parse() {
     std::getline(file, header);
     uint32_t numVertices, numEdges;
 
-    std::vector<uint32_t> header_vals = parse_numbers(header);
+    std::vector<uint32_t> header_vals = parse_numbers(header, true);
     // std::cout << "Header: " << std::to_string(header_vals.size()) << " values read." << std::endl;
     switch (header_vals.size()) {
         case 2:
