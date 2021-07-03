@@ -15,6 +15,7 @@ public:
     Graph(std::vector<edges_t> &&_vertices);
 
     bool is_well_colored() const;
+    uint32_t count_colors() const;
 };
 
 #endif //GRAPH_COLORING_GRAPH_H

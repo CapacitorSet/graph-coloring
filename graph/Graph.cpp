@@ -1,5 +1,6 @@
 #include "Graph.h"
-#include <algorithm>
+#include <cstddef>
+#include <unordered_set>
 
 Graph::Graph(std::vector<edges_t> &&_vertices) : vertices(_vertices), colors(vertices.size()) {
 
@@ -19,4 +20,9 @@ bool Graph::is_well_colored() const {
         }
     }
     return true;
+}
+
+uint32_t Graph::count_colors() const {
+    // Construct an unordered set of colors on the fly and return the number of elements in it
+    return std::unordered_set<color_t>(this->colors.cbegin(), this->colors.cend()).size();
 }

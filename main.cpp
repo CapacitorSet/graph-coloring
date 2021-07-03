@@ -8,7 +8,7 @@ int main(int argc, char **argv) {
     }
     Graph g = Parser(argv[1]).parse();
     if (g.is_well_colored()) {
-        std::cout << "Graph colored correctly!" << std::endl;
+        std::cout << "Graph colored correctly with " << std::to_string(g.count_colors()) << " colors!" << std::endl;
     } else {
         std::cout << "The graph was not colored." << std::endl;
     }
