@@ -17,7 +17,7 @@ void SequentialSolver::solve(Graph &graph) {
     // For each element...
     for (uint32_t index : permutation) {
         std::set<color_t> neighbor_colors;
-        for (auto neighbor : graph.neighbors_of(index))
+        for (const auto &neighbor : graph.neighbors_of(index))
             neighbor_colors.emplace(graph.color_of(neighbor));
 
         // Find smallest color not in the set of neighbor colors

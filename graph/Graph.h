@@ -20,7 +20,7 @@ public:
     uint32_t count_colors() const;
 
     color_t color_of(uint32_t v) const;
-    edges_t neighbors_of(uint32_t v) const;
+    const edges_t & neighbors_of(uint32_t v) const;
 
     void clear_colors();
 };

@@ -31,7 +31,7 @@ color_t Graph::color_of(uint32_t v) const {
     return colors[v];
 }
 
-edges_t Graph::neighbors_of(uint32_t v) const {
+const edges_t& Graph::neighbors_of(uint32_t v) const {
     return vertices[v];
 }
 
