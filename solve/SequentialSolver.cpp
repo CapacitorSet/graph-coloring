@@ -22,8 +22,11 @@ void SequentialSolver::solve(Graph &graph) {
 
         // Find smallest color not in the set of neighbor colors
         color_t smallest_color = 0;
-        while (neighbor_colors.find(smallest_color) != neighbor_colors.end())
-            smallest_color++;
+        for (uint32_t neighbor_color : neighbor_colors)
+            if (smallest_color != neighbor_color)
+                break;
+            else
+                smallest_color++;
 
         graph.colors[index] = smallest_color;
     }
