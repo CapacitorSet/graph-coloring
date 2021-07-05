@@ -5,8 +5,7 @@
 #include "SequentialSolver.h"
 
 void SequentialSolver::solve(Graph &graph) {
-    std::random_device random_dev;
-    std::mt19937 random_gen(random_dev());
+    std::mt19937 random_gen(RANDOM_SEED);
 
     // Create a random permutation of {v_0, v_1... v_n}
     std::vector<uint32_t> permutation(graph.vertices.size());

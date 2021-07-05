@@ -4,6 +4,12 @@
 #include <string>
 #include "../graph/Graph.h"
 
+#if WITH_RANDOM_SEED
+#define RANDOM_SEED (std::random_device()())
+#else
+#define RANDOM_SEED 123
+#endif
+
 // Define a common solver interface for benchmarking.
 
 class Solver {
