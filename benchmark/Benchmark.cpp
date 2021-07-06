@@ -2,7 +2,7 @@
 #include <iostream>
 #include "Benchmark.h"
 
-Benchmark::Benchmark(Graph &g) : sequential(), graph(g) {}
+Benchmark::Benchmark(Graph &g) : sequential(), luby(), graph(g) {}
 
 void Benchmark::run() {
     std::cout << "Running: " << sequential.name << std::endl;
@@ -10,6 +10,12 @@ void Benchmark::run() {
     printf("%s: %.2f ms (%s, %d colors)\n",
            sequential.name.c_str(), seq_res.milliseconds,
            seq_res.success ? "success" : "fail", seq_res.num_colors);
+
+    std::cout << "Running: " << luby.name << std::endl;
+    struct result luby_res = run_single(&luby);
+    printf("%s: %.2f ms (%s, %d colors)\n",
+           sequential.name.c_str(), luby_res.milliseconds,
+           luby_res.success ? "success" : "fail", luby_res.num_colors);
 }
 
 struct result Benchmark::run_single(Solver *solver) {

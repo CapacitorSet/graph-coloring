@@ -1,4 +1,5 @@
 #include <sstream>
+#include <algorithm>
 #include "Parser.h"
 
 MetisParser::MetisParser(std::ifstream &&_file, const std::string &filename)
@@ -50,6 +51,8 @@ std::vector<uint32_t> MetisParser::parse_numbers(const std::string &line, bool i
             number -= 1; // In the Metis format, vertices start from 1
         ret.emplace_back(number);
     }
+    // Sorted vectors allows for efficient algorithms like std::set_intersection
+    std::sort(ret.begin(), ret.end());
     return ret;
 }
 

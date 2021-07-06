@@ -1,6 +1,7 @@
 #include "Graph.h"
 #include <cstddef>
 #include <unordered_set>
+#include <algorithm>
 
 Graph::Graph(std::vector<edges_t> &&_vertices) : vertices(_vertices), colors(vertices.size()) {
 
@@ -35,6 +36,36 @@ const edges_t& Graph::neighbors_of(uint32_t v) const {
     return vertices[v];
 }
 
+uint32_t Graph::degree_of(uint32_t v) const {
+    return neighbors_of(v).size();
+}
+
 void Graph::clear_colors() {
     std::fill(colors.begin(), colors.end(), 0);
+}
+
+void Graph::remove_vertex(uint32_t v) {
+    deleted.set(v);
+    /*
+    // Drop the current vertex from its neighbors' edges...
+    for (uint32_t neighbor : vertices[v])
+        vertices[neighbor].erase(std::find(vertices[neighbor].cbegin(), vertices[neighbor].cend(), v));
+    // Drop the current vertex from this->vertices...
+    vertices.erase(vertices.cbegin() + v);
+    // And update existing neighbor IDs
+    for (edges_t &edges : vertices) {
+        for (uint32_t &neighbor : edges) {
+            if (neighbor > v)
+                neighbor--;
+        }
+    }
+    */
+}
+
+bool Graph::is_deleted(uint32_t v) const {
+    return deleted.test(v);
+}
+
+bool Graph::empty() const {
+    return vertices.size() == deleted.count();
 }
