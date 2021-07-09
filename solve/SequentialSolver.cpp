@@ -31,6 +31,6 @@ void SequentialSolver::solve(Graph &graph) {
     }
 }
 
-SequentialSolver::SequentialSolver() {
-    this->name = "SequentialSolver";
+std::string SequentialSolver::name() const {
+    return "SequentialSolver";
 }

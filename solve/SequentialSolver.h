@@ -5,7 +5,9 @@
 
 class SequentialSolver : public Solver {
 public:
-    SequentialSolver();
+    SequentialSolver() = default;
+
+    std::string name() const;
 
     void solve(Graph&);
 };

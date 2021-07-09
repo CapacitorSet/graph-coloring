@@ -6,6 +6,7 @@
 #include "Solver.h"
 
 class LubySolver : public Solver {
+    int num_threads;
     std::mt19937 gen;
     std::vector<uint32_t> MIS;
     std::set<uint32_t> V;
@@ -18,7 +19,9 @@ class LubySolver : public Solver {
     void compute_MIS(const Graph &src);
 
 public:
-    LubySolver();
+    LubySolver(int num_threads = 1);
+
+    std::string name() const;
 
     void solve(Graph&);
 

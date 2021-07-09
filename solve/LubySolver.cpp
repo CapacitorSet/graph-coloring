@@ -3,9 +3,7 @@
 #include <random>
 #include <set>
 
-LubySolver::LubySolver() : gen(RANDOM_SEED) {
-    this->name = "LubySolver";
-}
+LubySolver::LubySolver(int num_threads) : num_threads(num_threads), gen(RANDOM_SEED) {}
 
 void LubySolver::solve(Graph &original_graph) {
     Graph graph(original_graph);
@@ -110,4 +108,8 @@ void LubySolver::remove_edges(std::vector<uint32_t> &S, const Graph &g) {
             }
         }
     }
+}
+
+std::string LubySolver::name() const {
+    return "LubySolver (" + std::to_string(num_threads) + " threads)";
 }

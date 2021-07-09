@@ -1,21 +1,23 @@
 #include <chrono>
 #include <iostream>
 #include "Benchmark.h"
+#include "../solve/SequentialSolver.h"
+#include "../solve/LubySolver.h"
 
-Benchmark::Benchmark(Graph &g) : sequential(), luby(), graph(g) {}
+Benchmark::Benchmark(Graph &g) : solvers({
+    new SequentialSolver(),
+    new LubySolver(),
+}), graph(g) {}
 
 void Benchmark::run() {
-    std::cout << "Running: " << sequential.name << std::endl;
-    struct result seq_res = run_single(&sequential);
-    printf("%s: %.2f ms (%s, %d colors)\n",
-           sequential.name.c_str(), seq_res.milliseconds,
-           seq_res.success ? "success" : "fail", seq_res.num_colors);
-
-    std::cout << "Running: " << luby.name << std::endl;
-    struct result luby_res = run_single(&luby);
-    printf("%s: %.2f ms (%s, %d colors)\n",
-           sequential.name.c_str(), luby_res.milliseconds,
-           luby_res.success ? "success" : "fail", luby_res.num_colors);
+    for (Solver *s : solvers) {
+        std::cout << s->name() << ":" << std::endl;
+        struct result res = run_single(s);
+        printf("%.2f ms (%s, %d colors)\n\n",
+               res.milliseconds,
+               res.success ? "success" : "fail",
+               res.num_colors);
+    }
 }
 
 struct result Benchmark::run_single(Solver *solver) {

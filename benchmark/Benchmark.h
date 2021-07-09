@@ -1,8 +1,7 @@
 #ifndef GRAPH_COLORING_BENCHMARK_H
 #define GRAPH_COLORING_BENCHMARK_H
 
-#include "../solve/SequentialSolver.h"
-#include "../solve/LubySolver.h"
+#include "../solve/Solver.h"
 
 struct result {
     bool success;
@@ -11,8 +10,7 @@ struct result {
 };
 
 class Benchmark {
-    SequentialSolver sequential;
-    LubySolver luby;
+    std::vector<Solver *> solvers;
 
     Graph graph;
 

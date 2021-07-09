@@ -14,7 +14,7 @@
 
 class Solver {
 public:
-    std::string name;
+    virtual std::string name() const = 0;
 
     virtual void solve(Graph &) = 0;
 };
