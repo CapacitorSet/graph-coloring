@@ -3,10 +3,14 @@
 #include "Benchmark.h"
 #include "../solve/SequentialSolver.h"
 #include "../solve/LubySolver.h"
+#include "../solve/JonesSolver.h"
 
 Benchmark::Benchmark(Graph &g) : solvers({
     new SequentialSolver(),
     new LubySolver(),
+    new JonesSolver(1),
+    new JonesSolver(2),
+    new JonesSolver(4),
 }), graph(g) {}
 
 void Benchmark::run() {
