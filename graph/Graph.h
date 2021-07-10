@@ -30,6 +30,9 @@ public:
 
     void remove_vertex(uint32_t v);
 
+    // Color vertex v with the smallest color that is not the same as a neighbor's, and return the color
+    color_t color_with_smallest(uint32_t v);
+
     void clear_colors();
 };
 

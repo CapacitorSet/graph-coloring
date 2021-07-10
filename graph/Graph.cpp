@@ -1,11 +1,10 @@
 #include "Graph.h"
-#include <cstddef>
-#include <unordered_set>
 #include <algorithm>
+#include <cstddef>
+#include <set>
+#include <unordered_set>
 
-Graph::Graph(std::vector<edges_t> &&_vertices) : vertices(_vertices), colors(vertices.size()) {
-
-}
+Graph::Graph(std::vector<edges_t> &&_vertices) : vertices(_vertices), colors(vertices.size()) {}
 
 bool Graph::is_well_colored() const {
     // For all vertices...
@@ -32,7 +31,7 @@ color_t Graph::color_of(uint32_t v) const {
     return colors[v];
 }
 
-const edges_t& Graph::neighbors_of(uint32_t v) const {
+const edges_t &Graph::neighbors_of(uint32_t v) const {
     return vertices[v];
 }
 
@@ -68,4 +67,21 @@ bool Graph::is_deleted(uint32_t v) const {
 
 bool Graph::empty() const {
     return vertices.size() == deleted.count();
+}
+
+color_t Graph::color_with_smallest(uint32_t v) {
+    std::set<color_t> neighbor_colors;
+    for (const auto &neighbor : neighbors_of(v))
+        neighbor_colors.emplace(color_of(neighbor));
+
+    // Find smallest color not in the set of neighbor colors
+    color_t smallest_color = 0;
+    for (uint32_t neighbor_color : neighbor_colors)
+        if (smallest_color != neighbor_color)
+            break;
+        else
+            smallest_color++;
+    colors[v] = smallest_color;
+
+    return smallest_color;
 }

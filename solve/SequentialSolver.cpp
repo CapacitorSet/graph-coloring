@@ -13,22 +13,10 @@ void SequentialSolver::solve(Graph &graph) {
     std::iota(permutation.begin() + 1, permutation.end(), 1);
     std::shuffle(permutation.begin(), permutation.end(), random_gen);
 
-    // For each element...
-    for (uint32_t index : permutation) {
-        std::set<color_t> neighbor_colors;
-        for (const auto &neighbor : graph.neighbors_of(index))
-            neighbor_colors.emplace(graph.color_of(neighbor));
-
-        // Find smallest color not in the set of neighbor colors
-        color_t smallest_color = 0;
-        for (uint32_t neighbor_color : neighbor_colors)
-            if (smallest_color != neighbor_color)
-                break;
-            else
-                smallest_color++;
-
-        graph.colors[index] = smallest_color;
-    }
+    // For each vertex...
+    for (uint32_t index : permutation)
+        // Color it with the smallest color not in its neighbors' colors
+        graph.color_with_smallest(index);
 }
 
 std::string SequentialSolver::name() const {
