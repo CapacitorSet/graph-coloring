@@ -39,13 +39,17 @@ uint32_t Graph::degree_of(uint32_t v) const {
     return neighbors_of(v).size();
 }
 
-void Graph::clear_colors() {
+void Graph::clear() {
     std::fill(colors.begin(), colors.end(), 0);
+    deleted.reset();
 }
 
+// It would be very slow to update the list of vertices to account for the removal of this vertex,
+// so we just use a "deleted" bitset.
 void Graph::remove_vertex(uint32_t v) {
     deleted.set(v);
     /*
+    // Slow solution
     // Drop the current vertex from its neighbors' edges...
     for (uint32_t neighbor : vertices[v])
         vertices[neighbor].erase(std::find(vertices[neighbor].cbegin(), vertices[neighbor].cend(), v));

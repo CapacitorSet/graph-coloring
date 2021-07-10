@@ -30,7 +30,7 @@ struct result Benchmark::run_single(Solver *solver) {
     auto t2 = std::chrono::high_resolution_clock::now();
     bool success = graph.is_well_colored();
     uint32_t num_colors = graph.count_colors();
-    graph.clear_colors();
+    graph.clear();
 
     double milliseconds = std::chrono::duration<double, std::milli>(t2 - t1).count();
     return {success, num_colors, milliseconds};

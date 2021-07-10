@@ -34,7 +34,9 @@ public:
     // Color vertex v with the smallest color that is not the same as a neighbor's, and return the color
     color_t color_with_smallest(uint32_t v);
 
-    void clear_colors();
+    // Reset the graph for usage by another algorithm.
+    // Clears colors and the deleted set
+    void clear();
 };
 
 #endif //GRAPH_COLORING_GRAPH_H
