@@ -1,11 +1,11 @@
-#ifndef GRAPH_COLORING_METISPARSER1_H
-#define GRAPH_COLORING_METISPARSER1_H
+#ifndef GRAPH_COLORING_DIMACS10PARSER_H
+#define GRAPH_COLORING_DIMACS10PARSER_H
 
 #include <fstream>
 #include <vector>
 #include "../graph/Graph.h"
 
-class MetisParser {
+class Dimacs10Parser {
     std::ifstream file;
     std::ofstream fastparse_file;
 
@@ -20,9 +20,9 @@ class MetisParser {
     static void serialize(uint32_t, std::ostream &out);
 
 public:
-    MetisParser(std::ifstream &&, const std::string &filename);
+    Dimacs10Parser(std::ifstream &&, const std::string &filename);
 
     Graph parse();
 };
 
-#endif //GRAPH_COLORING_METISPARSER1_H
+#endif //GRAPH_COLORING_DIMACS10PARSER_H

@@ -1,9 +1,9 @@
 #include <sstream>
 #include <algorithm>
 #include "Parser.h"
-#include "MetisParser.h"
+#include "Dimacs10Parser.h"
 
-MetisParser::MetisParser(std::ifstream &&_file, const std::string &filename)
+Dimacs10Parser::Dimacs10Parser(std::ifstream &&_file, const std::string &filename)
         : file(std::move(_file)), fastparse_file(filename + ".fast") {
     if (!fastparse_file.is_open())
         throw std::runtime_error("Failed to open fastparse file for writing!");
@@ -11,7 +11,7 @@ MetisParser::MetisParser(std::ifstream &&_file, const std::string &filename)
 }
 
 // We do not need to worry about large copies: the compiler will move() the vector because of RVO
-Graph MetisParser::parse() {
+Graph Dimacs10Parser::parse() {
     std::string header;
     std::getline(file, header);
     uint32_t numVertices, numEdges;
@@ -41,7 +41,7 @@ Graph MetisParser::parse() {
     return Graph(std::move(vertices));
 }
 
-std::vector<uint32_t> MetisParser::parse_numbers(const std::string &line, bool is_header) {
+std::vector<uint32_t> Dimacs10Parser::parse_numbers(const std::string &line, bool is_header) {
     std::vector<uint32_t> ret;
     std::istringstream line_str(line);
     std::string number_str;
@@ -57,7 +57,7 @@ std::vector<uint32_t> MetisParser::parse_numbers(const std::string &line, bool i
     return ret;
 }
 
-void MetisParser::serialize(const std::vector<edges_t> &vertices, std::ostream &out) {
+void Dimacs10Parser::serialize(const std::vector<edges_t> &vertices, std::ostream &out) {
     // Start with the number of vertices (standardized to u32)
     serialize(static_cast<uint32_t>(vertices.size()), out);
     // Then serialize each vertex
@@ -65,7 +65,7 @@ void MetisParser::serialize(const std::vector<edges_t> &vertices, std::ostream &
         serialize(vertex, out);
 }
 
-void MetisParser::serialize(const edges_t &vertex, std::ostream &out) {
+void Dimacs10Parser::serialize(const edges_t &vertex, std::ostream &out) {
     // Start with the number of neighbors
     serialize(static_cast<uint32_t>(vertex.size()), out);
     // Then serialize each neighbor
@@ -73,6 +73,6 @@ void MetisParser::serialize(const edges_t &vertex, std::ostream &out) {
         serialize(neighbor, out);
 }
 
-void MetisParser::serialize(uint32_t val, std::ostream &out) {
+void Dimacs10Parser::serialize(uint32_t val, std::ostream &out) {
     out.write(reinterpret_cast<const char *>(&val), sizeof(uint32_t));
 }

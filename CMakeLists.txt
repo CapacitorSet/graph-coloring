@@ -7,7 +7,7 @@ add_executable(graph_coloring
         main.cpp
         graph/Graph.h graph/Graph.cpp
         parse/Parser.cpp parse/Parser.h
-        parse/MetisParser.cpp parse/MetisParser.h
+        parse/Dimacs10Parser.cpp parse/Dimacs10Parser.h
         parse/FastParser.cpp parse/FastParser.h
         solve/Solver.h
         solve/SequentialSolver.cpp solve/SequentialSolver.h
