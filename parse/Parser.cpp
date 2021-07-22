@@ -3,7 +3,7 @@
 Parser::Parser(const std::string &filename) {
     std::ifstream file(filename);
     if (!file.is_open())
-        throw "Failed to open file.";
+        throw std::runtime_error("Failed to open file.");
 
     if (filename.find(".fast") == std::string::npos)
         parser = MetisParser(std::move(file), filename);
@@ -16,5 +16,5 @@ Graph Parser::parse() {
         return std::get<MetisParser>(parser).parse();
     if (std::holds_alternative<FastParser>(parser))
         return std::get<FastParser>(parser).parse();
-    throw "No valid parser registered!";
+    throw std::runtime_error("No valid parser registered!");
 }

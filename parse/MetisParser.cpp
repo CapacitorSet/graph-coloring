@@ -6,7 +6,7 @@
 MetisParser::MetisParser(std::ifstream &&_file, const std::string &filename)
         : file(std::move(_file)), fastparse_file(filename + ".fast") {
     if (!fastparse_file.is_open())
-        throw "Failed to open fastparse file for writing!";
+        throw std::runtime_error("Failed to open fastparse file for writing!");
 
 }
 
@@ -24,7 +24,7 @@ Graph MetisParser::parse() {
             numEdges = header_vals[1];
             break;
         default:
-            throw "Unexpected header size";
+            throw std::runtime_error("Unexpected header size");
     }
 
     std::vector<edges_t> vertices;
