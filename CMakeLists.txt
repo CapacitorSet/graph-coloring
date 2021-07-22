@@ -3,5 +3,16 @@ project(graph_coloring)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(graph_coloring main.cpp parse/Parser.cpp parse/Parser.h graph/Graph.h graph/Graph.cpp graph/Graph.cpp graph/Graph.h solve/SequentialSolver.cpp solve/SequentialSolver.h solve/Solver.h benchmark/Benchmark.cpp benchmark/Benchmark.h parse/MetisParser.cpp parse/FastParser.cpp solve/LubySolver.cpp solve/LubySolver.h solve/JonesSolver.cpp solve/JonesSolver.h)
+add_executable(graph_coloring
+        main.cpp
+        graph/Graph.h graph/Graph.cpp
+        parse/Parser.cpp parse/Parser.h
+        parse/MetisParser.cpp parse/MetisParser.h
+        parse/FastParser.cpp parse/FastParser.h
+        solve/Solver.h
+        solve/SequentialSolver.cpp solve/SequentialSolver.h
+        solve/LubySolver.cpp solve/LubySolver.h
+        solve/JonesSolver.cpp solve/JonesSolver.h
+        benchmark/Benchmark.cpp benchmark/Benchmark.h
+)
 target_link_libraries(graph_coloring PRIVATE pthread)

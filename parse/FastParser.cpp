@@ -1,4 +1,5 @@
 #include "Parser.h"
+#include "FastParser.h"
 
 FastParser::FastParser(std::ifstream &&_file) : file(std::move(_file)) {}
 

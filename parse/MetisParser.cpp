@@ -1,6 +1,7 @@
 #include <sstream>
 #include <algorithm>
 #include "Parser.h"
+#include "MetisParser.h"
 
 MetisParser::MetisParser(std::ifstream &&_file, const std::string &filename)
         : file(std::move(_file)), fastparse_file(filename + ".fast") {

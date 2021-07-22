@@ -1,4 +1,3 @@
-#include <iostream>
 #include "Parser.h"
 
 Parser::Parser(const std::string &filename) {
