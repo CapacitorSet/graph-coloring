@@ -1,22 +1,25 @@
 #ifndef GRAPH_COLORING_PARSER_H
 #define GRAPH_COLORING_PARSER_H
 
-#include <string>
-#include <vector>
-#include <fstream>
-#include <variant>
-
 #include "../graph/Graph.h"
-#include "DimacsParser.h"
-#include "Dimacs10Parser.h"
-#include "FastParser.h"
+
+// Parser interface
+class IParser {
+public:
+    virtual ~IParser() = default;
+    virtual Graph parse() = 0;
+};
 
 class Parser {
-    // std::monostate is used when the variant is yet to be initialized (when the constructor is running).
-    std::variant<std::monostate, DimacsParser, Dimacs10Parser, FastParser> parser;
+    IParser *parser;
+
+    static IParser *get_parser(const std::string &filename);
 
 public:
+    double milliseconds;
+
     Parser(const std::string &filename);
+    ~Parser();
 
     Graph parse();
 };

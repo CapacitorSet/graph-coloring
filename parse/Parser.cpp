@@ -1,26 +1,34 @@
+#include <chrono>
 #include "Parser.h"
+#include "FastParser.h"
+#include "DimacsParser.h"
+#include "Dimacs10Parser.h"
 
-Parser::Parser(const std::string &filename) {
+Parser::Parser(const std::string &filename) : parser(get_parser(filename)) {}
+
+Parser::~Parser() {
+    delete parser;
+}
+
+IParser *Parser::get_parser(const std::string &filename) {
     std::ifstream file(filename);
     if (!file.is_open())
         throw std::runtime_error("Failed to open file.");
 
     if (filename.find(".fast") != std::string::npos)
-        parser = FastParser(file);
+        return new FastParser(file);
     else if (filename.find(".graph") != std::string::npos)
-        parser = Dimacs10Parser(file, filename);
+        return new Dimacs10Parser(file, filename);
     else if (filename.find(".gra") != std::string::npos)
-        parser = DimacsParser(file, filename);
+        return new DimacsParser(file, filename);
     else
         throw std::runtime_error("Unrecognized file format");
 }
 
 Graph Parser::parse() {
-    if (std::holds_alternative<Dimacs10Parser>(parser))
-        return std::get<Dimacs10Parser>(parser).parse();
-    if (std::holds_alternative<DimacsParser>(parser))
-        return std::get<DimacsParser>(parser).parse();
-    if (std::holds_alternative<FastParser>(parser))
-        return std::get<FastParser>(parser).parse();
-    throw std::runtime_error("No valid parser registered!");
+    auto t1 = std::chrono::high_resolution_clock::now();
+    Graph g = parser->parse();
+    auto t2 = std::chrono::high_resolution_clock::now();
+    milliseconds = std::chrono::duration<double, std::milli>(t2 - t1).count();
+    return g;
 }

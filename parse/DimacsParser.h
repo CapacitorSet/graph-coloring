@@ -4,8 +4,9 @@
 #include <fstream>
 #include <vector>
 #include "../graph/Graph.h"
+#include "Parser.h"
 
-class DimacsParser {
+class DimacsParser : public IParser {
     std::ifstream file;
     std::ofstream fastparse_file;
 

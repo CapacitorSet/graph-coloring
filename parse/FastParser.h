@@ -2,8 +2,9 @@
 #define GRAPH_COLORING_FASTPARSER1_H
 
 #include <fstream>
+#include "Parser.h"
 
-class FastParser {
+class FastParser : public IParser {
     std::ifstream file;
 
     // Deserialize a single u32
