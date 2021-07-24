@@ -12,6 +12,10 @@ JonesSolver::JonesSolver(int num_threads)
     pthread_barrier_init(&rho_barrier, nullptr, num_threads);
 }
 
+JonesSolver::~JonesSolver() {
+    pthread_barrier_destroy(&rho_barrier);
+}
+
 std::string JonesSolver::name() const {
     return "JonesSolver (" + std::to_string(num_threads) + " threads)";
 }

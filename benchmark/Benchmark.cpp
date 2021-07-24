@@ -26,6 +26,7 @@ void Benchmark::run() {
                double(res.peak_mem_usage) / 1024 / 1024,
                res.success ? "success" : "fail",
                res.num_colors);
+        delete s;
     }
 }
 

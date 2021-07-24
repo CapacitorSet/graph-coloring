@@ -44,6 +44,7 @@ class JonesSolver : public Solver {
 
 public:
     JonesSolver(int num_threads = 1);
+    ~JonesSolver();
 
     std::string name() const;
 
