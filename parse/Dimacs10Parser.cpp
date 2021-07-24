@@ -3,7 +3,7 @@
 #include "Parser.h"
 #include "Dimacs10Parser.h"
 
-Dimacs10Parser::Dimacs10Parser(std::ifstream &&_file, const std::string &filename)
+Dimacs10Parser::Dimacs10Parser(std::ifstream &_file, const std::string &filename)
         : file(std::move(_file)), fastparse_file(filename + ".fast") {
     if (!fastparse_file.is_open())
         throw std::runtime_error("Failed to open fastparse file for writing!");
@@ -14,21 +14,19 @@ Dimacs10Parser::Dimacs10Parser(std::ifstream &&_file, const std::string &filenam
 Graph Dimacs10Parser::parse() {
     std::string header;
     std::getline(file, header);
-    uint32_t numVertices, numEdges;
+    uint32_t numVertices;
 
     std::vector<uint32_t> header_vals = parse_numbers(header, true);
-    // std::cout << "Header: " << std::to_string(header_vals.size()) << " values read." << std::endl;
     switch (header_vals.size()) {
         case 2:
             numVertices = header_vals[0];
-            numEdges = header_vals[1];
+            // numEdges = header_vals[1];
             break;
         default:
             throw std::runtime_error("Unexpected header size");
     }
 
-    std::vector<edges_t> vertices;
-    vertices.resize(numVertices);
+    std::vector<edges_t> vertices(numVertices);
     std::string line;
     for (uint32_t i = 0; i < numVertices; i++) {
         std::getline(file, line);

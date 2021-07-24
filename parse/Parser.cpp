@@ -6,11 +6,11 @@ Parser::Parser(const std::string &filename) {
         throw std::runtime_error("Failed to open file.");
 
     if (filename.find(".fast") != std::string::npos)
-        parser = FastParser(std::move(file));
+        parser = FastParser(file);
     else if (filename.find(".graph") != std::string::npos)
-        parser = Dimacs10Parser(std::move(file), filename);
+        parser = Dimacs10Parser(file, filename);
     else if (filename.find(".gra") != std::string::npos)
-        parser = DimacsParser(std::move(file), filename);
+        parser = DimacsParser(file, filename);
     else
         throw std::runtime_error("Unrecognized file format");
 }

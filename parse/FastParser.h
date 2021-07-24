@@ -9,7 +9,7 @@ class FastParser {
     // Deserialize a single u32
     static uint32_t deserialize(std::istream &out);
 public:
-    FastParser(std::ifstream &&);
+    FastParser(std::ifstream &);
 
     Graph parse();
 };

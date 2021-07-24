@@ -3,7 +3,7 @@
 #include "Parser.h"
 #include "DimacsParser.h"
 
-DimacsParser::DimacsParser(std::ifstream &&_file, const std::string &filename)
+DimacsParser::DimacsParser(std::ifstream &_file, const std::string &filename)
         : file(std::move(_file)), fastparse_file(filename + ".fast") {
     if (!fastparse_file.is_open())
         throw std::runtime_error("Failed to open fastparse file for writing!");

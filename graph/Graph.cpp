@@ -4,7 +4,7 @@
 #include <set>
 #include <unordered_set>
 
-Graph::Graph(std::vector<edges_t> &&_vertices) : vertices(_vertices), colors(vertices.size()) {}
+Graph::Graph(std::vector<edges_t> &&_vertices) : vertices(std::move(_vertices)), colors(vertices.size()) {}
 
 bool Graph::is_well_colored() const {
     // For all vertices...

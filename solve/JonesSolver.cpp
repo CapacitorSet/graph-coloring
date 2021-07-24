@@ -1,9 +1,7 @@
 #include "JonesSolver.h"
 #include <algorithm>
-#include <iostream>
 #include <shared_mutex>
 #include <set>
-#include <map>
 #include <csignal>
 
 JonesSolver::JonesSolver(int num_threads)

@@ -20,7 +20,7 @@ class DimacsParser {
     static void serialize(uint32_t, std::ostream &out);
 
 public:
-    DimacsParser(std::ifstream &&, const std::string &filename);
+    DimacsParser(std::ifstream &, const std::string &filename);
 
     Graph parse();
 };
