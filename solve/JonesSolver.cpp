@@ -6,7 +6,7 @@
 
 JonesSolver::JonesSolver(int num_threads)
         : num_threads(num_threads), gen(RANDOM_SEED), rho_barrier(),
-          thread_queue(num_threads), queue_mutex(num_threads), thread_cv(num_threads) {
+          thread_queue(num_threads) {
     pthread_barrier_init(&rho_barrier, nullptr, num_threads);
 }
 
@@ -36,9 +36,7 @@ void JonesSolver::solve(Graph &graph) {
 // Eg. if there are four threads the first will handle vertices 0, 4, 8..., the second will handle 1, 5, 9...
 void JonesSolver::thread_function(uint32_t thread_idx, Graph *graph, JonesSolver &solver) {
     std::unordered_map<uint32_t, ColoringProcess> processes(graph->vertices.size());
-    std::vector<uint32_t> &queue = solver.thread_queue[thread_idx];
-    std::mutex &queue_mutex = solver.queue_mutex[thread_idx];
-    std::condition_variable &cv = solver.thread_cv[thread_idx];
+    auto &queue = solver.thread_queue[thread_idx];
 
     // For each vertex handled by this thread
     for (uint32_t v = thread_idx; v < graph->vertices.size(); v += solver.num_threads)
@@ -55,17 +53,10 @@ void JonesSolver::thread_function(uint32_t thread_idx, Graph *graph, JonesSolver
         }
     }
 
-    while (!processes.empty() && !std::all_of(processes.cbegin(), processes.cend(),
-                                              [](const std::pair<uint32_t, ColoringProcess> &p) { return p.second.waitlist.empty(); })) {
-        std::unique_lock<std::mutex> lk(queue_mutex);
-        cv.wait(lk, [&]() { return !queue.empty(); });
-        // We use a while loop (rather than looping once) so we can add elements to the queue in notify_vertex_changed
-        // and process them immediately, without going through the condition variable
+    while (!std::all_of(processes.cbegin(), processes.cend(),
+                [](const std::pair<uint32_t, ColoringProcess> &p) { return p.second.waitlist.empty(); })) {
         while (!queue.empty()) {
-            uint32_t colored = queue.back();
-            queue.pop_back();
-            // We no longer need access to the queue; we'll re-lock it at the end of the while body
-            lk.unlock();
+            uint32_t colored = queue.pop();
 
             // "Send" the color to this vertex's neighbors.
             for (uint32_t neighbor : graph->neighbors_of(colored)) {
@@ -81,7 +72,6 @@ void JonesSolver::thread_function(uint32_t thread_idx, Graph *graph, JonesSolver
                     solver.notify_vertex_changed(neighbor, *graph);
                 }
             }
-            lk.lock();
         }
     }
 }
@@ -95,10 +85,7 @@ void JonesSolver::notify_vertex_changed(uint32_t changed, const Graph &graph) {
         if (was_notified.test(thread_idx))
             continue;
         was_notified.set(thread_idx);
-        // We don't have to worry about recursive locks, since thread_function releases the lock as soon as it pops an item from the queue
-        std::unique_lock<std::mutex> lk(queue_mutex[thread_idx]);
-        thread_queue[thread_idx].emplace_back(changed);
-        thread_cv[thread_idx].notify_one();
+        thread_queue[thread_idx].push(changed);
     }
 }
 

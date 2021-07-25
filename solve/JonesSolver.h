@@ -6,6 +6,7 @@
 #include <condition_variable>
 #include <unordered_map>
 #include "Solver.h"
+#include "../utils/PCVector.h"
 
 class JonesSolver;
 
@@ -21,11 +22,8 @@ public:
 
 class JonesSolver : public Solver {
     std::vector<std::thread> threads;
-    // For each thread, hold a "queue" (vector) of vertices that have been colored and have yet to be "received".
-    // Each queue has a mutex to lock it, and a condition variable to notify its thread that a new message was sent.
-    std::vector<std::vector<uint32_t>> thread_queue;
-    std::vector<std::mutex> queue_mutex;
-    std::vector<std::condition_variable> thread_cv;
+    // For each thread, hold a "queue" (vector) of vertices that have been colored and have yet to be "received"
+    std::vector<PCVector<uint32_t>> thread_queue;
 
     int num_threads;
     std::mt19937 gen;
