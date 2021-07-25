@@ -22,10 +22,22 @@ public:
 
     // Produce item val
     void push(const T& val) {
+        if (stopped)
+            throw std::runtime_error("Writing to stopped queue");
         mutex.lock();
         data.emplace_back(val);
         mutex.unlock();
         sem_post(&full);
+    };
+
+    // Consume an item; if the queue is empty, wait until something is pushed
+    T pop() {
+        sem_wait(&full);
+        mutex.lock();
+        T ret = data.back();
+        data.pop_back();
+        mutex.unlock();
+        return ret;
     };
 
     // Consume an item; if the queue is empty, return std::nullopt
@@ -48,6 +60,10 @@ public:
     // Check if there is no more work to be done
     bool done() const {
         return stopped && data.empty();
+    };
+
+    bool empty() const {
+        return data.empty();
     };
 };
 
