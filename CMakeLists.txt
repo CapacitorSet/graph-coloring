@@ -15,5 +15,5 @@ add_executable(graph_coloring
         solve/LubySolver.cpp solve/LubySolver.h
         solve/JonesSolver.cpp solve/JonesSolver.h
         benchmark/Benchmark.cpp benchmark/Benchmark.h
-)
+        utils/PCVector.h)
 target_link_libraries(graph_coloring PRIVATE pthread)
