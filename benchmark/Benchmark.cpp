@@ -36,7 +36,7 @@ struct result Benchmark::run_single(Solver *solver) {
     // Used to tell the thread when to stop measuring
     std::promise<void> stop;
     std::future<void> stop_f = stop.get_future();
-    uint64_t baseline_mem_usage = 0;current_mem_usage();
+    uint64_t baseline_mem_usage = current_mem_usage();
 
     std::thread mem_monitor_thread(mem_monitor_thread_function, std::ref(mem_usage_p), std::ref(stop_f));
     auto t1 = std::chrono::high_resolution_clock::now();
