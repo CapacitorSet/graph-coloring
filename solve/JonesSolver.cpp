@@ -55,17 +55,15 @@ void JonesSolver::thread_function(uint32_t thread_idx, Graph *graph, JonesSolver
 
     while (!std::all_of(processes.cbegin(), processes.cend(),
                 [](const std::pair<uint32_t, ColoringProcess> &p) { return p.second.waitlist.empty(); })) {
-        while (!queue.empty()) {
-            uint32_t colored = queue.pop();
-
+        while (std::optional<uint32_t> colored = queue.try_pop()) {
             // "Send" the color to this vertex's neighbors.
-            for (uint32_t neighbor : graph->neighbors_of(colored)) {
+            for (uint32_t neighbor : graph->neighbors_of(*colored)) {
                 if (solver.thread_for(neighbor) != thread_idx)
                     continue;
                 ColoringProcess &process = processes.at(neighbor);
                 if (process.waitlist.empty())
                     continue;
-                bool done = process.receive(colored);
+                bool done = process.receive(*colored);
                 if (done) {
                     // All the neighboring nodes were colored, so we can color the main node now
                     graph->color_with_smallest(neighbor);

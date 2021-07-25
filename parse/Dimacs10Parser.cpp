@@ -83,12 +83,7 @@ void Dimacs10Parser::serialize(uint32_t val, std::ostream &out) {
 }
 
 void Dimacs10Parser::thread_function(PCVector<message_t> &queue) {
-    while (!queue.done()) {
-        auto message = queue.try_pop();
-        if (!message) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            continue;
-        }
+    while (auto message = queue.pop()) {
         // Parse the line and put it into the iterator
         // Note that no locking is required: we always access different positions in the vector
         *message->second = parse_numbers(message->first);
