@@ -19,6 +19,9 @@ public:
     PCVector() {
         sem_init(&full, 0, 0);
     }
+    ~PCVector() {
+        sem_destroy(&full);
+    }
 
     // Produce item val
     void push(const T& val) {
