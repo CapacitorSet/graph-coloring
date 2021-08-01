@@ -16,10 +16,10 @@ class PCVector {
     sem_t full_or_done;
 
 public:
-    PCVector() {
+    PCVector() : stopped(false) {
         sem_init(&full_or_done, 0, 0);
     }
-    PCVector(std::vector<T> &&_data) : data(std::move(_data)) {
+    PCVector(std::vector<T> &&_data) : data(std::move(_data)), stopped(false) {
         sem_init(&full_or_done, 0, data.size());
     }
     ~PCVector() {
