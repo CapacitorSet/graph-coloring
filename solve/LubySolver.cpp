@@ -6,13 +6,13 @@
 LubySolver::LubySolver(int num_threads) : num_threads(num_threads), gen(RANDOM_SEED) {}
 
 void LubySolver::solve(Graph &original_graph) {
-    Graph graph(original_graph);
+    Graph uncolored_graph(original_graph);
     color_t color = 0;
-    while (!graph.empty()) {
-        compute_MIS(graph);
+    while (!uncolored_graph.empty()) {
+        compute_MIS(uncolored_graph);
         for (uint32_t vertex : MIS) {
             original_graph.colors[vertex] = color;
-            graph.remove_vertex(vertex);
+            uncolored_graph.remove_vertex(vertex);
         }
         color++;
     }
