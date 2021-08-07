@@ -14,6 +14,9 @@ DimacsParser::DimacsParser(std::ifstream &_file, const std::string &filename)
 Graph DimacsParser::parse() {
     std::string header;
     std::getline(file, header);
+    // Some files begin with this string for some reason; read the next line if so
+    if (header == "graph_for_greach")
+        std::getline(file, header);
     uint32_t numVertices = std::stoul(header);
 
     std::vector<edges_t> vertices(numVertices);
