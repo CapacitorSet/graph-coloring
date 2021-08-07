@@ -35,6 +35,8 @@ Graph DimacsParser::parse() {
         std::sort(edges.begin(), edges.end());
 
     serialize(vertices, fastparse_file);
+    // Ensure that the fastparse graph was written, so that crashes do not result in a malformed file
+    fastparse_file.flush();
 
     return Graph(std::move(vertices));
 }
