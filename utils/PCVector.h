@@ -42,29 +42,13 @@ public:
         if (stopped) {
             // Reincrement the semaphore to wake up other threads
             sem_post(&full_or_done);
-            return std::nullopt;
+            // Note that even if the queue is stopped we must check if there are any items left!
         }
-        mutex.lock();
+        std::unique_lock lock(mutex);
+        if (done())
+            return std::nullopt;
         T ret = data.back();
         data.pop_back();
-        mutex.unlock();
-        return ret;
-    };
-
-    // Consume an item; if the queue is empty, return std::nullopt
-    std::optional<T> try_pop() {
-        if (empty())
-            return std::nullopt;
-        sem_wait(&full_or_done);
-        if (stopped) {
-            // Reincrement the semaphore to wake up other threads
-            sem_post(&full_or_done);
-            return std::nullopt;
-        }
-        mutex.lock();
-        T ret = data.back();
-        data.pop_back();
-        mutex.unlock();
         return ret;
     };
 
