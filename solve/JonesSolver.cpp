@@ -1,17 +1,7 @@
 #include "JonesSolver.h"
-#include <algorithm>
-#include <shared_mutex>
-#include <set>
-#include <csignal>
 
 JonesSolver::JonesSolver(int num_threads)
-        : num_threads(num_threads), gen(RANDOM_SEED), rho_barrier(),
-          thread_queue(num_threads) {
-    pthread_barrier_init(&rho_barrier, nullptr, num_threads);
-}
-
-JonesSolver::~JonesSolver() {
-    pthread_barrier_destroy(&rho_barrier);
+        : num_threads(num_threads), gen(RANDOM_SEED) {
 }
 
 std::string JonesSolver::name() const {
@@ -24,86 +14,48 @@ void JonesSolver::solve(Graph &graph) {
     std::iota(rho.begin() + 1, rho.end(), 1);
     std::shuffle(rho.begin(), rho.end(), gen);
 
-    for (uint32_t i = 0; i < num_threads; i++) {
-        threads.emplace_back(thread_function, i, &graph, std::ref(*this));
+    PCVector<uint32_t> free_vertices;
+    std::atomic<uint32_t> num_vertices_uncolored = graph.vertices.size();
+
+    // Initialize the waitlist
+    waitlist = std::move(std::vector<std::atomic<int>>(graph.vertices.size()));
+    for (uint32_t vertex = 0; vertex < graph.vertices.size(); ++vertex) {
+        const edges_t &neighbors = graph.neighbors_of(vertex);
+        auto rho_current = rho[vertex];
+        int num_wait = 0;
+        for (const auto neighbor : graph.neighbors_of(vertex))
+            if (rho[neighbor] > rho_current)
+                num_wait++;
+        waitlist[vertex] = num_wait;
+        if (num_wait == 0)
+            free_vertices.push(vertex);
     }
 
-    for (auto &t : threads)
-        t.join();
-}
+    std::vector<std::thread> thread_pool;
+    for (int i = 0; i < num_threads; i++)
+        thread_pool.emplace_back([&free_vertices, &num_vertices_uncolored, &graph, this]() {
+            while (std::optional<uint32_t> vertex = free_vertices.pop()) {
+                // Check if there are no vertices left to color
+                if (--num_vertices_uncolored == 0)
+                    // If so, tell all threads not to wait for more free vertices
+                    free_vertices.stop();
 
-// Vertices are split sequentially among threads.
-// Eg. if there are four threads the first will handle vertices 0, 4, 8..., the second will handle 1, 5, 9...
-void JonesSolver::thread_function(uint32_t thread_idx, Graph *graph, JonesSolver &solver) {
-    std::unordered_map<uint32_t, ColoringProcess> processes(graph->vertices.size());
-    auto &queue = solver.thread_queue[thread_idx];
-
-    // For each vertex handled by this thread
-    for (uint32_t v = thread_idx; v < graph->vertices.size(); v += solver.num_threads)
-        // Create the "process" - just its data structures actually, control flow remains in this thread
-        processes.emplace(v, std::move(ColoringProcess(v, solver, *graph)));
-    pthread_barrier_wait(&solver.rho_barrier);
-
-    for (auto &pair : processes) {
-        auto vertex = pair.first;
-        ColoringProcess &process = pair.second;
-        if (process.waitlist.empty()) {
-            graph->color_with_smallest(vertex);
-            solver.notify_vertex_changed(vertex, *graph);
-        }
-    }
-
-    while (!std::all_of(processes.cbegin(), processes.cend(),
-                [](const std::pair<uint32_t, ColoringProcess> &p) { return p.second.waitlist.empty(); })) {
-        while (std::optional<uint32_t> colored = queue.try_pop()) {
-            // "Send" the color to this vertex's neighbors.
-            for (uint32_t neighbor : graph->neighbors_of(*colored)) {
-                if (solver.thread_for(neighbor) != thread_idx)
-                    continue;
-                ColoringProcess &process = processes.at(neighbor);
-                if (process.waitlist.empty())
-                    continue;
-                bool done = process.receive(*colored);
-                if (done) {
-                    // All the neighboring nodes were colored, so we can color the main node now
-                    graph->color_with_smallest(neighbor);
-                    solver.notify_vertex_changed(neighbor, *graph);
+                // Color the current node...
+                graph.color_with_smallest(*vertex);
+                // And update any neighbor that may be "waiting" on it
+                for (uint32_t neighbor : graph.neighbors_of(*vertex)) {
+                    int val = --waitlist[neighbor];
+                    if (val == 0)
+                        free_vertices.push(neighbor);
                 }
+                /*
+                // Deadlock detection
+                if (num_threads == 1 && free_vertices.empty() && num_vertices_uncolored != 0)
+                    raise(SIGTRAP);
+                */
             }
-        }
-    }
-}
+        });
 
-// Add the changed vertex into the queue of each neighbor's thread
-void JonesSolver::notify_vertex_changed(uint32_t changed, const Graph &graph) {
-    // Avoid notifying the same thread several times if it owns several neighbors
-    std::bitset<4096> was_notified;
-    for (const auto &neighbor : graph.neighbors_of(changed)) {
-        uint32_t thread_idx = thread_for(neighbor);
-        if (was_notified.test(thread_idx))
-            continue;
-        was_notified.set(thread_idx);
-        thread_queue[thread_idx].push(changed);
-    }
-}
-
-uint32_t JonesSolver::thread_for(uint32_t vertex) const {
-    return vertex % num_threads;
-}
-
-ColoringProcess::ColoringProcess(uint32_t v, const JonesSolver &solver, const Graph &graph) {
-    for (uint32_t w : graph.neighbors_of(v))
-        if (solver.rho[w] > solver.rho[v])
-            waitlist.emplace_back(w);
-    // Note that we do not use a send_queue: we just check when all neighbors have been colored
-}
-
-bool ColoringProcess::receive(uint32_t v) {
-    // We can use lower_bound since the waitlist is a sorted vector of neighbors
-    auto pos = std::lower_bound(waitlist.cbegin(), waitlist.cend(), v);
-    // Todo: remove
-    if (pos == waitlist.cend())
-        raise(SIGTRAP);
-    waitlist.erase(pos);
-    return waitlist.empty();
+    for (auto &t : thread_pool)
+        t.join();
 }
