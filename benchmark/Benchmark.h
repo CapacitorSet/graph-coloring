@@ -19,9 +19,6 @@ class Benchmark {
     // Return the number of milliseconds when using the given solver
     struct result run_single(Solver *);
 
-    static void mem_monitor_thread_function(std::promise<uint64_t> &result, std::future<void> &stop);
-    static uint64_t current_mem_usage();
-
 public:
     Benchmark(Graph &);
 
