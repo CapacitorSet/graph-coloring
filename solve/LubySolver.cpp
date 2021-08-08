@@ -1,7 +1,6 @@
 #include "LubySolver.h"
 #include <algorithm>
 #include <random>
-#include <set>
 
 LubySolver::LubySolver(int num_threads) : num_threads(num_threads), gen(RANDOM_SEED) {}
 
@@ -25,7 +24,9 @@ void LubySolver::compute_MIS(const Graph &src) {
     MIS.clear();
     V.clear();
 
-    for (uint32_t i = 0; i < src.vertices.size(); i++)
+    uint32_t num_vertices = src.vertices.size();
+
+    for (uint32_t i = 0; i < num_vertices; i++)
         // It suffices to check for is_deleted here, since we don't delete vertices inside the function
         if (!src.is_deleted(i))
             V.emplace(i);
@@ -33,11 +34,13 @@ void LubySolver::compute_MIS(const Graph &src) {
     while (!V.empty()) {
         // The subset of vertices selected
         // We use std::vector as the iterator for std::set is very slow
-        std::vector<uint32_t> S = probabilistic_select(src);
+        std::vector<char> S = probabilistic_select(src);
 
         remove_edges(S, src);
 
-        for (uint32_t v : S) {
+        for (int v = 0; v < num_vertices; v++) {
+            if (!S[v])
+                continue;
             MIS.emplace_back(v);
             V.erase(v);
             for (uint32_t neighbor : src.neighbors_of(v))
@@ -46,66 +49,46 @@ void LubySolver::compute_MIS(const Graph &src) {
     }
 }
 
-std::vector<uint32_t> LubySolver::probabilistic_select(const Graph &graph) {
-    std::vector<uint32_t> S;
+std::vector<char> LubySolver::probabilistic_select(const Graph &graph) {
+    std::vector<char> S(graph.vertices.size());
     // For each vertex, include it or not with probability 1/(2/d(v))
     for (uint32_t i : V) {
         double probability = 1. / (2 * graph.degree_of(i));
         std::bernoulli_distribution d(probability);
         if (d(gen))
-            S.emplace_back(i);
+            S[i] = true;
     }
     return S;
 }
 
-void LubySolver::remove_edges(std::vector<uint32_t> &S, const Graph &g) {
+void LubySolver::remove_edges(std::vector<char> &S, const Graph &g) {
     // Optimization: do not check for edges if we have less than 2 nodes
     if (S.size() < 2)
         return;
 
     // For each edge in E, check that "from" and "to" are in the graph.
-    // Because g.vertices is sorted, and the vector of edges is also sorted in
-    // the Metis parser, we can use a more efficient algo: set_intersection.
 
     // First, check that the "from" index is in the graph S.
-    std::vector<uint32_t> from_candidates, from_indices(g.vertices.size());
-    from_candidates.reserve(std::max(S.size(), g.vertices.size()));
-    for (uint32_t i = 0; i < g.vertices.size(); i++)
-        from_indices[i] = i;
-
-    std::set_intersection(
-            from_indices.cbegin(), from_indices.cend(),
-            S.cbegin(), S.cend(),
-            std::back_inserter(from_candidates));
-
-    for (uint32_t from : from_candidates) {
-        // Note that we do not need to check for is_deleted.
-        // If an element is in S it was in V, which we already checked.
-
-        // Then, check that the "to" index is in the graph S.
-        const edges_t &neighbors = g.vertices[from];
-        std::vector<uint32_t> edges_in_graph;
-        edges_in_graph.reserve(std::max(S.size(), neighbors.size()));
-        // If we already counted 1 -> 2, do not count 2 -> 1 again:
-        // we start searching at the first neighbor higher than the "from" vertex
-        auto first_new_neighbor = std::lower_bound(neighbors.cbegin(), neighbors.cend(), from);
-        std::set_intersection(
-                first_new_neighbor, neighbors.cend(),
-                S.cbegin(), S.cend(),
-                std::back_inserter(edges_in_graph));
-
-        for (uint32_t to : edges_in_graph) {
-            if (g.degree_of(from) <= g.degree_of(to)) {
-                // std::lower_bound is std::find for sorted containers.
-                auto from_pos = std::lower_bound(S.cbegin(), S.cend(), from);
-                // The item may not be found if we already removed it
-                if (from_pos != S.cend())
-                    S.erase(from_pos);
-            } else {
-                auto to_pos = std::lower_bound(S.cbegin(), S.cend(), to);
-                if (to_pos != S.cend())
-                    S.erase(to_pos);
-            }
+    uint32_t num_vertices = g.vertices.size();
+    for (uint32_t from = 0; from < num_vertices; from++) {
+        if (!S[from])
+            continue;
+        // Then, check that the "to" index is also in S.
+        /*
+        // Equivalent to:
+        for (uint32_t to : g.neighbors_of(from)) {
+            if (to < from)
+                continue;
+        */
+        auto &neighbors = g.neighbors_of(from);
+        for (auto pos = std::lower_bound(neighbors.cbegin(), neighbors.cend(), from); pos != neighbors.cend(); ++pos) {
+            uint32_t to = *pos;
+            if (!S[to])
+                continue;
+            if (g.degree_of(from) <= g.degree_of(to))
+                S[from] = false;
+            else
+                S[to] = false;
         }
     }
 }
