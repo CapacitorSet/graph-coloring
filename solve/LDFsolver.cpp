@@ -4,7 +4,7 @@ LDFsolver::LDFsolver(int num_threads) : num_threads(num_threads) {}
 
 void LDFsolver::solve(Graph &original_graph) {
     std::vector<uint32_t> degrees;
-    compute_Degreess(degrees, original_graph.vertices.size());
+    compute_Degrees(degrees, original_graph.vertices.size());
 
     std::vector<uint32_t> vertices_to_color(degrees.size());
     compute_vertices_to_color_in_order(degrees, vertices_to_color);
@@ -15,7 +15,7 @@ void LDFsolver::solve(Graph &original_graph) {
     }
 }
 
-void LDFsolver::compute_Degrees(std::vector<uint32_t> &degrees, uint32_t &num_vertices) {
+void LDFsolver::compute_Degrees(std::vector<uint32_t> &degrees, uint32_t num_vertices) {
     for (uint32_t i = 0; i < num_vertices; i++) {
         degrees.emplace_back(original_graph.degree_of(i));
     }

@@ -16,6 +16,8 @@ class Graph {
     friend class SequentialSolver;
     friend class LubySolver;
     friend class JonesSolver;
+    friend class LDFsolver;
+    friend class RandomPrioritySolver;
 
 public:
     Graph(std::vector<edges_t> &&_vertices);
