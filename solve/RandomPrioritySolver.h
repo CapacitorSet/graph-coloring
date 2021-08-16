@@ -10,8 +10,6 @@
 
 class RandomPrioritySolver : public Solver {
     int num_threads;
-    uint32_t num_vertices_at_begining;
-    std::mt19937 gen;
     std::vector<uint32_t> Random_Priority_Vec;
     std::vector<bool> Destroy_Vec;
     std::vector<uint32_t> MIS;
@@ -20,10 +18,10 @@ class RandomPrioritySolver : public Solver {
     std::mutex wrt_mutex;
 
     void compute_MIS(const Graph &src);
-    void vertex_job(uint32_t thID, Graph &src); //const std::vector<uint32_t> &Remaining_Vertices, std::vector<uint32_t> &Random_Priority_Vec, std::vector<uint32_t> &Destroy_Vec, std::vector<uint32_t> &MIS);
-
+    void vertex_job(uint32_t thID, Graph &src, std::barrier &sync_point1, std::barrier &sync_point2);
+    
 public:
-    RandomPrioritySolver(int num_threads = 1, uint32_t num_vertices_at_begining);
+    RandomPrioritySolver(int num_threads = 1);
 
     std::string name() const;
 

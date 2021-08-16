@@ -4,7 +4,7 @@
 #include <thread>
 #include <barrier>
 
-RandomPrioritySolver::RandomPrioritySolver(int num_threads) : num_threads(num_threads), gen(RANDOM_SEED) {}
+RandomPrioritySolver::RandomPrioritySolver(int num_threads) : num_threads(num_threads) {}
 
 void RandomPrioritySolver::solve(Graph &original_graph)
 {
