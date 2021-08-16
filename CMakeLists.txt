@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(graph_coloring)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 add_executable(graph_coloring
         main.cpp
@@ -14,6 +14,8 @@ add_executable(graph_coloring
         solve/SequentialSolver.cpp solve/SequentialSolver.h
         solve/LubySolver.cpp solve/LubySolver.h
         solve/JonesSolver.cpp solve/JonesSolver.h
+        solve/RandomPrioritySolver.cpp solve/RandomPrioritySolver.h
+        solve/LDFsolver.cpp solve/LDFsolver.h
         benchmark/Benchmark.cpp benchmark/Benchmark.h
         benchmark/MemoryMonitor.cpp benchmark/MemoryMonitor.h
         utils/PCVector.h

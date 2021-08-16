@@ -63,7 +63,7 @@ void RandomPrioritySolver::compute_MIS(const Graph &src)
     }
 }
 
-void RandomPrioritySolver::vertex_job(uint32_t thID, Graph &src, std::barrier &sync_point1, std::barrier &sync_point2)
+void RandomPrioritySolver::vertex_job(uint32_t thID, Graph &src, std::barrier<DummyFunction> &sync_point1, std::barrier<DummyFunction> &sync_point2)
 {
 
     uint32_t vertexID = Remaining_Vertices[thID];

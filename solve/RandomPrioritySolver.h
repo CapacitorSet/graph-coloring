@@ -3,10 +3,15 @@
 
 #include <random>
 #include <set>
-#include <stdlib.h>
+#include <cstdlib>
 #include <barrier>
 #include "Solver.h"
 #include <mutex>
+
+class DummyFunction {
+public:
+    void operator()() {};
+};
 
 class RandomPrioritySolver : public Solver {
     int num_threads;
@@ -18,8 +23,8 @@ class RandomPrioritySolver : public Solver {
     std::mutex wrt_mutex;
 
     void compute_MIS(const Graph &src);
-    void vertex_job(uint32_t thID, Graph &src, std::barrier &sync_point1, std::barrier &sync_point2);
-    
+    void vertex_job(uint32_t thID, Graph &src, std::barrier<DummyFunction> &sync_point1, std::barrier<DummyFunction> &sync_point2);
+
 public:
     RandomPrioritySolver(int num_threads = 1);
 
