@@ -9,13 +9,12 @@ void LDFsolver::solve(Graph &original_graph) {
     std::vector<uint32_t> vertices_to_color(degrees.size());
     compute_vertices_to_color_in_order(degrees, vertices_to_color);
 
-    for (uint32_t vertex_to_color : vertices_to_color)
-    {
+    for (uint32_t vertex_to_color : vertices_to_color) {
         original_graph.color_with_smallest(vertex_to_color);
     }
 }
 
-void LDFsolver::compute_Degrees(std::vector<uint32_t> &degrees, uint32_t num_vertices) {
+void LDFsolver::compute_Degrees(std::vector<uint32_t> &degrees, uint32_t num_vertices, Graph &original_graph) {
     for (uint32_t i = 0; i < num_vertices; i++) {
         degrees.emplace_back(original_graph.degree_of(i));
     }

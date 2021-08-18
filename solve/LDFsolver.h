@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <random>
 #include <vector>
+#include <numeric>
 #include "Solver.h"
 
 class LDFsolver : public Solver {
@@ -19,7 +20,7 @@ public:
 
     void solve(Graph&);
 
-    void compute_Degrees(std::vector<uint32_t> &degrees, uint32_t num_vertices);
+    void compute_Degrees(std::vector<uint32_t> &degrees, uint32_t num_vertices, Graph &original_graph);
 
     void compute_vertices_to_color_in_order(std::vector<uint32_t> &degrees, std::vector<uint32_t> &vertices_to_color);
 
