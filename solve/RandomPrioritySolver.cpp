@@ -43,8 +43,8 @@ void RandomPrioritySolver::compute_MIS(const Graph &src)
 
     uint32_t num_vertices_Remaining = Remaining_Vertices.size();
 
-    std::barrier sync_point1(num_vertices_at_begining);
-    std::barrier sync_point2(num_vertices_at_begining);
+    std::barrier<DummyFunction> sync_point1(num_vertices_Remaining);
+    std::barrier<DummyFunction> sync_point2(num_vertices_Remaining);
 
     Random_Priority_Vec.reserve(num_verticies_graph);
     Destroy_Vec.assign(num_verticies_graph, false);
