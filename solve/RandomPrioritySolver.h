@@ -4,14 +4,11 @@
 #include <random>
 #include <set>
 #include <cstdlib>
-#include <barrier>
 #include "Solver.h"
 #include <mutex>
-
-class DummyFunction {
-public:
-    void operator()() {};
-};
+#include <algorithm>
+#include <thread>
+#include <pthread.h>
 
 class RandomPrioritySolver : public Solver {
     int num_threads;
@@ -21,9 +18,11 @@ class RandomPrioritySolver : public Solver {
     std::vector<uint32_t> Remaining_Vertices;
 
     std::mutex wrt_mutex;
+    // Synchronization object
+    pthread_barrier_t   barrier1;
+    pthread_barrier_t   barrier2;
 
     void compute_MIS(const Graph &src);
-    void vertex_job(uint32_t thID, Graph &src, std::barrier<DummyFunction> &sync_point1, std::barrier<DummyFunction> &sync_point2);
 
 public:
     RandomPrioritySolver(int num_threads = 1);
