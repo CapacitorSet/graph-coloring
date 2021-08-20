@@ -7,6 +7,7 @@
 #include "../solve/JonesSolver.h"
 #include "../solve/RandomPrioritySolver.h"
 #include "../solve/LDFsolver.h"
+#include "../solve/LDFsolverParallel.h"
 
 Benchmark::Benchmark(Graph &g) : solvers({
     new SequentialSolver(),
@@ -15,6 +16,7 @@ Benchmark::Benchmark(Graph &g) : solvers({
     new JonesSolver(2),
     new JonesSolver(4),
     new RandomPrioritySolver(),
+    new LDFsolverParallel(),
     new LDFsolver(),
 }), graph(g) {}
 
