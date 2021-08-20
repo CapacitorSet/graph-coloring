@@ -4,17 +4,13 @@ RandomPrioritySolver::RandomPrioritySolver(int num_threads) : num_threads(num_th
 
 void RandomPrioritySolver::solve(Graph &original_graph) {
     Graph uncolored_graph(original_graph);
-
     color_t color = 0;
-
     while (!uncolored_graph.empty()) {
         compute_MIS(uncolored_graph);
-
         for (uint32_t vertex : MIS) {
             original_graph.colors[vertex] = color;
             uncolored_graph.remove_vertex(vertex);
         }
-        
         color++;
     }
 }
