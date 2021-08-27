@@ -15,9 +15,6 @@ class Dimacs10Parser : public IParser {
     // Store the string to be parsed and the position where to put it
     using message_t = std::pair<std::string, position_t>;
     PCVector<message_t> queue;
-    std::vector<std::thread> threads;
-
-    static void thread_function(PCVector<message_t> &);
 
     // Parse a line into a vector of numbers
     static std::vector<uint32_t> parse_numbers(const std::string &line, bool is_header = false);

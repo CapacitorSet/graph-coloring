@@ -26,8 +26,11 @@ Graph Dimacs10Parser::parse() {
             throw std::runtime_error("Unexpected header size");
     }
 
-    for (int i = 0; i < 4; i++)
-        threads.emplace_back(thread_function, std::ref(queue));
+    queue.onReceive(4, (void (*)(message_t)) [](message_t message) {
+        // Parse the line and put it into the iterator
+        // Note that no locking is required: we always access different positions in the vector
+        *message.second = parse_numbers(message.first);
+    });
 
     std::vector<edges_t> vertices(numVertices);
     std::string line;
@@ -37,9 +40,7 @@ Graph Dimacs10Parser::parse() {
     }
 
     queue.stop();
-
-    for (auto &thread : threads)
-        thread.join();
+    queue.join();
 
     serialize(vertices, fastparse_file);
     // Ensure that the fastparse graph was written, so that crashes do not result in a malformed file
@@ -82,12 +83,4 @@ void Dimacs10Parser::serialize(const edges_t &vertex, std::ostream &out) {
 
 void Dimacs10Parser::serialize(uint32_t val, std::ostream &out) {
     out.write(reinterpret_cast<const char *>(&val), sizeof(uint32_t));
-}
-
-void Dimacs10Parser::thread_function(PCVector<message_t> &queue) {
-    while (auto message = queue.pop()) {
-        // Parse the line and put it into the iterator
-        // Note that no locking is required: we always access different positions in the vector
-        *message->second = parse_numbers(message->first);
-    }
 }

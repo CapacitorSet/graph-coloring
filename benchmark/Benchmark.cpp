@@ -16,7 +16,7 @@ Benchmark::Benchmark(Graph &g) : solvers({
     new JonesSolver(2),
     new JonesSolver(4),
     new RandomPrioritySolver(),
-    new LDFsolverParallel(),
+    new LDFsolverParallel(1),
     new LDFsolver(),
 }), graph(g) {}
 

@@ -1,19 +1,27 @@
 #ifndef GRAPH_COLORING_PCVECTOR_H
 #define GRAPH_COLORING_PCVECTOR_H
 
-#include <vector>
-#include <optional>
+#include <functional>
 #include <mutex>
+#include <optional>
+#include <vector>
 #include <semaphore.h>
 
 // A vector that implements the producer-consumer pattern.
 template<typename T>
 class PCVector {
+public:
+    using callback_t = void(T);
+
+private:
     std::vector<T> data;
     bool stopped;
 
     std::mutex mutex;
     sem_t full_or_done;
+
+    // Threads used by onReceive
+    std::vector<std::thread> threads;
 
 public:
     PCVector() : stopped(false) {
@@ -52,12 +60,36 @@ public:
         return ret;
     };
 
+    void onReceive(int num_threads, callback_t *callback) {
+        for (int i = 0; i < num_threads; i++)
+            threads.emplace_back([] (PCVector<T> &queue, callback_t *callback) {
+                while (std::optional<T> item = queue.pop()) {
+                    callback(*item);
+                }
+            }, std::ref(*this), callback);
+    }
+
+    void onReceive(int num_threads, std::function<callback_t> callback) {
+        for (int i = 0; i < num_threads; i++)
+            threads.emplace_back([=] (PCVector<T> &queue) {
+                while (std::optional<T> item = queue.pop()) {
+                    callback(*item);
+                }
+            }, std::ref(*this));
+    }
+
     // Signal that there are no more items to be produced
     // Do a "fictitious" post on full_or_done so it can wake up threads waiting for an element
     void stop() {
         stopped = true;
         sem_post(&full_or_done);
     };
+
+    // Join any onReceive thread
+    void join() {
+        for (auto &t : threads)
+            t.join();
+    }
 
     // Check if there is no more work to be done. Not to be confused with stop()
     [[nodiscard]] bool done() const {
