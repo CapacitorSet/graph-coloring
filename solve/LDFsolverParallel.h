@@ -9,18 +9,19 @@
 #include <random>
 #include <vector>
 #include <thread>
+#include <mutex>
 #include <numeric>
 #include <condition_variable>
 
 class LDFsolverParallel : public Solver {
-    std::vector<uint32_t> degrees;
-    uint32_t num_vertices = 0;
+    uint32_t num_threads;
 
-    void vertex_job(uint32_t vertex, Graph &graph);
+    std::mutex m;
+    
     void compute_vertices_to_color_in_order(std::vector<uint32_t> &degrees, std::vector<uint32_t> &vertices_to_color);
 
 public:
-    LDFsolverParallel();
+    LDFsolverParallel(int num_threads);
 
     std::string name() const;
 
