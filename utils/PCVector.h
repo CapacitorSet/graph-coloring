@@ -62,20 +62,30 @@ public:
 
     void onReceive(int num_threads, callback_t *callback) {
         for (int i = 0; i < num_threads; i++)
-            threads.emplace_back([] (PCVector<T> &queue, callback_t *callback) {
+            threads.emplace_back([] (PCVector<T> &queue, callback_t *callback, int i) {
+#if __linux__
+                // For debugging
+                std::string thread_name = "onReceive#" + std::to_string(i);
+                pthread_setname_np(pthread_self(), thread_name.c_str());
+#endif
                 while (std::optional<T> item = queue.pop()) {
                     callback(*item);
                 }
-            }, std::ref(*this), callback);
+            }, std::ref(*this), callback, i);
     }
 
     void onReceive(int num_threads, std::function<callback_t> callback) {
         for (int i = 0; i < num_threads; i++)
-            threads.emplace_back([=] (PCVector<T> &queue) {
+            threads.emplace_back([=](PCVector<T> &queue, int i) {
+#if __linux__
+                // For debugging
+                std::string thread_name = "onReceive#" + std::to_string(i);
+                pthread_setname_np(pthread_self(), thread_name.c_str());
+#endif
                 while (std::optional<T> item = queue.pop()) {
                     callback(*item);
                 }
-            }, std::ref(*this));
+            }, std::ref(*this), i);
     }
 
     // Signal that there are no more items to be produced
