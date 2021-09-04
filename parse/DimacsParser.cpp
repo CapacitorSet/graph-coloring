@@ -111,12 +111,12 @@ std::vector<edges_t> DimacsParser::merge_adj_lists(const std::vector<edges_t> &v
             int range_lower = items_per_thread * thread_idx;
             int range_higher = items_per_thread * (thread_idx + 1);
 
-            for (const auto &vertex : vertices) {
-                for (uint32_t edge : vertex) {
-                    if (edge >= range_lower && edge < range_higher) {
-                        merged_vertices[edge].push_back(edge);
-                    }
-                }
+            // If the edge 1->2 appears, we must create 2->1: vertices[destination].push_back(source).
+            for (int source_id = 0; source_id < vertices.size(); source_id++) {
+                auto &neighbors = vertices[source_id];
+                for (uint32_t destination : neighbors)
+                    if (destination >= range_lower && destination < range_higher)
+                        merged_vertices[destination].push_back(source_id);
             }
 
             // Sorted vectors allow for efficient algorithms like std::set_intersection
