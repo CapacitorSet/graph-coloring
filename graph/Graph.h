@@ -13,6 +13,8 @@ class Graph {
     std::vector<color_t> colors;
     std::bitset<(1<<24)> deleted; // Note that we support at most 2^24 nodes.
 
+    friend class Serializer;
+
     friend class SequentialSolver;
     friend class LubySolver;
     friend class JonesSolver;

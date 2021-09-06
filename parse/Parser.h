@@ -12,8 +12,8 @@ public:
 
 class Parser {
     IParser *parser;
-
-    static IParser *get_parser(const std::string &filename);
+    bool serializable;
+    std::string fast_filename;
 
 public:
     double milliseconds;

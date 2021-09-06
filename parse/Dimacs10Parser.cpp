@@ -42,10 +42,6 @@ Graph Dimacs10Parser::parse() {
     queue.stop();
     queue.join();
 
-    serialize(vertices, fastparse_file);
-    // Ensure that the fastparse graph was written, so that crashes do not result in a malformed file
-    fastparse_file.flush();
-
     return Graph(std::move(vertices));
 }
 
@@ -63,24 +59,4 @@ std::vector<uint32_t> Dimacs10Parser::parse_numbers(const std::string &line, boo
     // Sorted vectors allows for efficient algorithms like std::set_intersection
     std::sort(ret.begin(), ret.end());
     return ret;
-}
-
-void Dimacs10Parser::serialize(const std::vector<edges_t> &vertices, std::ostream &out) {
-    // Start with the number of vertices (standardized to u32)
-    serialize(static_cast<uint32_t>(vertices.size()), out);
-    // Then serialize each vertex
-    for (const edges_t &vertex : vertices)
-        serialize(vertex, out);
-}
-
-void Dimacs10Parser::serialize(const edges_t &vertex, std::ostream &out) {
-    // Start with the number of neighbors
-    serialize(static_cast<uint32_t>(vertex.size()), out);
-    // Then serialize each neighbor
-    for (const uint32_t &neighbor : vertex)
-        serialize(neighbor, out);
-}
-
-void Dimacs10Parser::serialize(uint32_t val, std::ostream &out) {
-    out.write(reinterpret_cast<const char *>(&val), sizeof(uint32_t));
 }

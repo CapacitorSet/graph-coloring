@@ -20,5 +20,5 @@ add_executable(graph_coloring
         benchmark/Benchmark.cpp benchmark/Benchmark.h
         benchmark/MemoryMonitor.cpp benchmark/MemoryMonitor.h
         utils/PCVector.h
-        )
+        parse/Serializer.cpp parse/Serializer.h)
 target_link_libraries(graph_coloring PRIVATE pthread)

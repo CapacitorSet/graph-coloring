@@ -25,10 +25,6 @@ Graph DimacsParser::parse() {
     // A new vector where to merge vertices, so as not to risk creating the same edges twice
     std::vector<edges_t> merged_vertices = merge_adj_lists(vertices);
 
-    serialize(merged_vertices, fastparse_file);
-    // Ensure that the fastparse graph was written, so that crashes do not result in a malformed file
-    fastparse_file.flush();
-
     return Graph(std::move(merged_vertices));
 }
 
@@ -47,26 +43,6 @@ std::vector<uint32_t> DimacsParser::parse_numbers(const std::string &line) {
         ret.emplace_back(number);
     }
     return ret;
-}
-
-void DimacsParser::serialize(const std::vector<edges_t> &vertices, std::ostream &out) {
-    // Start with the number of vertices (standardized to u32)
-    serialize(static_cast<uint32_t>(vertices.size()), out);
-    // Then serialize each vertex
-    for (const edges_t &vertex : vertices)
-        serialize(vertex, out);
-}
-
-void DimacsParser::serialize(const edges_t &vertex, std::ostream &out) {
-    // Start with the number of neighbors
-    serialize(static_cast<uint32_t>(vertex.size()), out);
-    // Then serialize each neighbor
-    for (const uint32_t &neighbor : vertex)
-        serialize(neighbor, out);
-}
-
-void DimacsParser::serialize(uint32_t val, std::ostream &out) {
-    out.write(reinterpret_cast<const char *>(&val), sizeof(uint32_t));
 }
 
 std::vector<edges_t> DimacsParser::parse_lines() {

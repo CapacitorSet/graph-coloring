@@ -20,13 +20,6 @@ class DimacsParser : public IParser {
     // Merge the adjacency lists
     std::vector<edges_t> merge_adj_lists(const std::vector<edges_t> &lists);
 
-    // Serialize the parsed graph to a file for usage with FastParser
-    static void serialize(const std::vector<edges_t> &vertices, std::ostream &out);
-    // Serialize a single vertex
-    static void serialize(const edges_t &vertex, std::ostream &out);
-    // Serialize a single u32
-    static void serialize(uint32_t, std::ostream &out);
-
 public:
     DimacsParser(std::ifstream &, const std::string &filename);
 
