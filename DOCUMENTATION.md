@@ -4,7 +4,7 @@ This project investigates the implementation of several parallel algorithms for 
 
 ## Overview
 
-The project is organized into a series of parsers (`parse/`), a series of solvers (`solve/`), and benchmarking utilities (`benchmark/`). `graph/` contains the data structure and some utility functions for storing graphs as an adjacency list; finally, `utils/PCVector.h` contains a queue that supports several producers and consumers, which is a common parallelization primitive.
+The project is organized into parsers (`parse/`), solvers (`solve/`), and benchmarking utilities (`benchmark/`). `graph/` contains the data structure and some utility functions for storing graphs as an adjacency list; finally, `utils/PCVector.h` contains a queue that supports several producers and consumers, which is a common parallelization primitive.
 
 ### Graph representation
 
@@ -14,7 +14,7 @@ The project is organized into a series of parsers (`parse/`), a series of solver
 
 We developed three parsers: one each for the DIMACS and DIMACS-10 formats, plus `FastParser` to work on binary files and achieve significantly higher parsing speeds.
 
-Profiling shows that parsing DIMACS graphs takes a long time to tokenize lines (i.e. split the string of nodes into a vector of node IDs) and parsing numbers into ints. For this reason, once a DIMACS graph is parsed it is saved to disk in a simple binary format that can be deserialized very efficiently.
+Profiling shows that parsing DIMACS graphs takes a long time to tokenize lines (i.e. split the string of nodes into a vector of node IDs) and parsing numbers into ints. For this reason, once a DIMACS graph is parsed it is saved to disk in a simple binary format (length-prefixed vectors) that can be deserialized very efficiently.
 
 #### Dimacs10Parser
 
@@ -24,11 +24,13 @@ In our implementation, the main threads acts as a line tokenizer and as a produc
 
 #### DimacsParser
 
-The DIMACS format is an adjacency list like DIMACS-10, but it presents a key challenge in that only neighbors with a higher ID are represented (the lower ones being implicit). In principle, this requires a sequential read as each adjacency list must be synchronized with the preceding ones.
+The DIMACS format is an adjacency list like DIMACS-10, but it presents a key challenge in that only neighbors with a higher ID are represented (the lower ones being implicit). In principle, this would require a sequential read as each adjacency list must be synchronized with the preceding ones.
+
+We parallelized the parsing by splitting it in two steps: first we parse the lines into partial adjacency lists, then we merge them. Specifically, the parallelization strategy is simple: the array is split in equal parts, one per thread.
 
 #### FastParser
 
-We developed a simple binary format for graphs with the goal of improving parsing speed for large graphs. It is based on length-prefixed vectors: the first 4 bytes contain the number of nodes `n`, and are followed by a list of `n` nodes. Each node is represented by 4 bytes for the number of neighbors `m`, and `m` 4-byte neighbor IDs.
+We developed a simple binary format for graphs with the goal of improving parsing speed for large graphs. It is based on length-prefixed vectors: the first 4 bytes contain the number of nodes `n`, and are followed by a list of `n` adjacency lists. Each adjacency list is represented by 4 bytes for the number of neighbors `m`, and `m` 4-byte vertex IDs.
 
 We provide a simple example of the graph for a triangle, with the DIMACS-10 file on the left and its `FastParser` representation (in base 10) on the right:
 
@@ -39,7 +41,7 @@ We provide a simple example of the graph for a triangle, with the DIMACS-10 file
 1 2 # Node 3 is connected to 1 and 2  | 2 1 2 # Node 3 has 2 neighbors: 1, 2.
 ```
 
-This format allows us to skip line tokenization, number tokenization, number parsing and list sorting: we only need to allocate vectors with a known size and copy the adjacency list directly from the file.
+This format allows us to skip line tokenization, number tokenization, number parsing and list sorting: we only need to allocate vectors with a known size and copy the adjacency list directly from the file. This parser is so fast that no parallelization is needed; furthermore, we estimate that the bottleneck is vector allocation, thus we expect no performance improvement from multithreading.
 
 ### Solvers
 
@@ -65,7 +67,7 @@ This format allows us to skip line tokenization, number tokenization, number par
 
 ### Benchmarking
 
-The Benchmark class holds a vector of pointers to `Solver`, the base class for all solvers, and calls the pure virtual method `solve()` to run each of them. For each run, the following parameters are measured:
+The Benchmark class is instantiated with a vector of solvers which implement the common interface `Solver`. For each run, the following parameters are measured:
 
 ```cpp
 struct result {
@@ -76,7 +78,7 @@ struct result {
 };
 ```
 
-The memory usage is monitored by spawning a `MemoryMonitor` thread that will read the current usage every 100 us. At this time only Linux is supported, and the measurement occurs by multiplying the number of pages for "data+stack" in `/proc/self/statm` by the page size.
+The memory usage is monitored by spawning a `MemoryMonitor` thread that will read the current usage every 100 us. At this time only Linux is supported via `/proc/self/statm`.
 
 ### PCVector
 
