@@ -29,7 +29,7 @@ void JonesSolver::solve(Graph &graph) {
             free_vertices.push(vertex);
     }
 
-    free_vertices.onReceive(num_threads, [&free_vertices, &num_vertices_uncolored, &graph, &waitlist](uint32_t vertex) {
+    free_vertices.onReceive(num_threads, [&free_vertices, &num_vertices_uncolored, &graph, &waitlist, &rho](uint32_t vertex) {
         // Check if there are no vertices left to color
         if (--num_vertices_uncolored == 0)
             // If so, tell all threads not to wait for more free vertices
@@ -39,8 +39,8 @@ void JonesSolver::solve(Graph &graph) {
         graph.color_with_smallest(vertex);
         // And update any neighbor that may be "waiting" on it
         for (uint32_t neighbor: graph.neighbors_of(vertex)) {
-            int val = --waitlist[neighbor];
-            if (val == 0)
+            // If it is no longer waiting on anything, push it to the free vertices queue
+            if (rho[vertex] > rho[neighbor] && --waitlist[neighbor] == 0)
                 free_vertices.push(neighbor);
         }
         /*
