@@ -16,7 +16,7 @@ class LubySolver : public Solver {
     // Second step
     inline void remove_edges(std::vector<char> &S, const Graph &);
     // Luby's algorithm
-    void compute_MIS(const Graph &src);
+    void compute_MIS(const DeletableGraph &src);
 
 public:
     LubySolver(int num_threads = 1);

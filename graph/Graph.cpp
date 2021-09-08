@@ -41,15 +41,12 @@ uint32_t Graph::degree_of(uint32_t v) const {
 
 void Graph::clear() {
     std::fill(colors.begin(), colors.end(), 0);
-    deleted.reset();
 }
 
-// It would be very slow to update the list of vertices to account for the removal of this vertex,
-// so we just use a "deleted" bitset.
+/* It would be very slow to update the list of vertices to account for the removal of this vertex,
+ * so we just use a "deleted" bitset in DeletableGraph.
+ * Slow implementation:
 void Graph::remove_vertex(uint32_t v) {
-    deleted.set(v);
-    /*
-    // Slow solution
     // Drop the current vertex from its neighbors' edges...
     for (uint32_t neighbor : vertices[v])
         vertices[neighbor].erase(std::find(vertices[neighbor].cbegin(), vertices[neighbor].cend(), v));
@@ -62,16 +59,8 @@ void Graph::remove_vertex(uint32_t v) {
                 neighbor--;
         }
     }
-    */
 }
-
-bool Graph::is_deleted(uint32_t v) const {
-    return deleted.test(v);
-}
-
-bool Graph::empty() const {
-    return vertices.size() == deleted.count();
-}
+*/
 
 color_t Graph::color_with_smallest(uint32_t v) {
     std::set<color_t> neighbor_colors;
@@ -88,4 +77,22 @@ color_t Graph::color_with_smallest(uint32_t v) {
     colors[v] = smallest_color;
 
     return smallest_color;
+}
+
+DeletableGraph::DeletableGraph(const Graph &graph) : graph(graph) {}
+
+void DeletableGraph::delete_vertex(uint32_t v) {
+    deleted.set(v);
+}
+
+bool DeletableGraph::is_deleted(uint32_t v) const {
+    return deleted.test(v);
+}
+
+bool DeletableGraph::empty() const {
+    return graph.vertices.size() == deleted.count();
+}
+
+void DeletableGraph::clear() {
+    deleted.reset();
 }

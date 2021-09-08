@@ -3,13 +3,13 @@
 RandomPrioritySolver::RandomPrioritySolver(int num_threads) : num_threads(num_threads) {}
 
 void RandomPrioritySolver::solve(Graph &original_graph) {
-    Graph uncolored_graph(original_graph);
+    DeletableGraph uncolored_graph(original_graph);
     color_t color = 0;
     while (!uncolored_graph.empty()) {
         compute_MIS(uncolored_graph);
         for (uint32_t vertex : MIS) {
             original_graph.colors[vertex] = color;
-            uncolored_graph.remove_vertex(vertex);
+            uncolored_graph.delete_vertex(vertex);
         }
         color++;
     }
@@ -18,16 +18,17 @@ void RandomPrioritySolver::solve(Graph &original_graph) {
 // Best explained here:
 // https://en.wikipedia.org/wiki/Maximal_independent_set#Random-priority_parallel_algorithm
 
-void RandomPrioritySolver::compute_MIS(const Graph &src) {
+void RandomPrioritySolver::compute_MIS(const DeletableGraph &del_graph) {
     // Reset solver state
     MIS.clear();
     Remaining_Vertices.clear();
 
-    uint32_t num_verticies_graph = src.vertices.size();
+    const Graph &graph = del_graph.graph;
+    uint32_t num_verticies_graph = graph.vertices.size();
 
     for (uint32_t i = 0; i < num_verticies_graph; i++) {
         // It suffices to check for is_deleted here, since we don't delete vertices inside the function
-        if (!src.is_deleted(i)) {
+        if (!del_graph.is_deleted(i)) {
             Remaining_Vertices.emplace_back(i);
         }
     }
@@ -45,7 +46,7 @@ void RandomPrioritySolver::compute_MIS(const Graph &src) {
         pthread_barrier_init(&barrier2, NULL, num_vertices_Remaining);
 
         for (uint32_t thID = 0; thID < num_vertices_Remaining; thID++) {
-            threadPool.emplace_back(std::thread([&thID, &src, this] () {
+            threadPool.emplace_back(std::thread([&thID, &graph, this] () {
 
                 uint32_t vertexID = Remaining_Vertices[thID];
 
@@ -55,7 +56,7 @@ void RandomPrioritySolver::compute_MIS(const Graph &src) {
                 // Send it to the neighbours "Announce it"
                 Random_Priority_Vec[vertexID] = RandNum;
 
-                edges_t neighbors = src.neighbors_of(vertexID);
+                edges_t neighbors = graph.neighbors_of(vertexID);
                 edges_t remaining_neighbors;
                 bool IamTheSmallest = true;
 

@@ -5,13 +5,13 @@
 LubySolver::LubySolver(int num_threads) : num_threads(num_threads), gen(RANDOM_SEED) {}
 
 void LubySolver::solve(Graph &original_graph) {
-    Graph uncolored_graph(original_graph);
+    DeletableGraph uncolored_graph(original_graph);
     color_t color = 0;
     while (!uncolored_graph.empty()) {
         compute_MIS(uncolored_graph);
         for (uint32_t vertex : MIS) {
             original_graph.colors[vertex] = color;
-            uncolored_graph.remove_vertex(vertex);
+            uncolored_graph.delete_vertex(vertex);
         }
         color++;
     }
@@ -19,31 +19,32 @@ void LubySolver::solve(Graph &original_graph) {
 
 // Best explained here:
 // https://en.wikipedia.org/wiki/Maximal_independent_set#Random-selection_parallel_algorithm_[Luby's_Algorithm]
-void LubySolver::compute_MIS(const Graph &src) {
+void LubySolver::compute_MIS(const DeletableGraph &del_graph) {
     // Reset solver state
     MIS.clear();
     V.clear();
 
-    uint32_t num_vertices = src.vertices.size();
+    const Graph &graph = del_graph.graph;
+    uint32_t num_vertices = graph.vertices.size();
 
     for (uint32_t i = 0; i < num_vertices; i++)
         // It suffices to check for is_deleted here, since we don't delete vertices inside the function
-        if (!src.is_deleted(i))
+        if (!del_graph.is_deleted(i))
             V.emplace(i);
 
     while (!V.empty()) {
         // The subset of vertices selected
         // We use std::vector as the iterator for std::set is very slow
-        std::vector<char> S = probabilistic_select(src);
+        std::vector<char> S = probabilistic_select(graph);
 
-        remove_edges(S, src);
+        remove_edges(S, graph);
 
         for (int v = 0; v < num_vertices; v++) {
             if (!S[v])
                 continue;
             MIS.emplace_back(v);
             V.erase(v);
-            for (uint32_t neighbor : src.neighbors_of(v))
+            for (uint32_t neighbor : graph.neighbors_of(v))
                 V.erase(neighbor);
         }
     }

@@ -22,7 +22,7 @@ class RandomPrioritySolver : public Solver {
     pthread_barrier_t   barrier1;
     pthread_barrier_t   barrier2;
 
-    void compute_MIS(const Graph &src);
+    void compute_MIS(const DeletableGraph &src);
 
 public:
     RandomPrioritySolver(int num_threads = 1);
