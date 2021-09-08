@@ -8,7 +8,11 @@ The project is organized into parsers (`parse/`), solvers (`solve/`), and benchm
 
 ### Graph representation
 
-*To do*
+Among the three common data structures for graph representation (adjacency list, adjacency matrix or incidence matrix), memory constraints require us to use the adjacency list format, given the requirement to process graphs with several millions of nodes and edges.
+
+The "Compressed Sparse Row" (Yale) format was taken into consideration. Although it presents a small improvement in memory usage by allocating a contiguous array of edges, expressing the neighbor list in code requires either `std::span` (a C++20 feature which many users may not have access to) or impractical alternatives (constructing a `std::vector` on the fly, returning a pair of iterators, or developing a custom version of `std::span`), it was discarded.
+
+We did however add a small improvement the data structure. MIS-based algorithms (eg. Luby) constantly delete vertices from the graph; this operation is rather expensive, requiring one to update the adjacency lists for the neighbors, and especially so in our case, where removing a vertex invalidates subsequent vertex IDs which must be then decremented. For this reason we do not actually delete vertices from the data structure, but rather add a `std::bitset deleted` on top of it which allows for fast deletion. It comes of course with the small downside that vertices must be checked against the bitset before they can be used, but profiling shows that this is not an issue at this time.
 
 ### Parsers
 
