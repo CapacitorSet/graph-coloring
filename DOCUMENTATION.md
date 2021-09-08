@@ -51,11 +51,13 @@ This format allows us to skip line tokenization, number tokenization, number par
 
 #### Sequential
 
-*To do*
+`SequentialSolver` implements the simple, well-known greedy strategy described in the specifications document, and mentioned in literature in *A parallel graph coloring heuristic*, M. Jones and P. Plassmann, 1992. It is single-threaded, i.e. sequential.
 
 #### Luby
 
-*To do*
+`LubySolver` implements the algorithm from *A simple parallel algorithm for the Maximal Independent Set problem*, M. Luby, 1985. It features two parallel steps, which we named `probabilistic_select` and `remove_edges`, and one sequential step, where the MIS is constructed. We then add a sequential step that colors the MIS, not mentioned in Luby's paper because it does not address graph coloring directly.
+
+*To do: parallelization*
 
 #### Jones
 
