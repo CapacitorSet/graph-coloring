@@ -1,12 +1,46 @@
 #include "LubySolver.h"
-#include <algorithm>
-#include <random>
-#include <thread>
 
-LubySolver::LubySolver(int num_threads) : num_threads(num_threads), gen(RANDOM_SEED) {}
+LubySolver::LubySolver(int num_threads) : num_threads(num_threads), partial_S(num_threads), kill_threads(false), gen(RANDOM_SEED) {
+    pthread_barrier_init(&thread_start_barrier, nullptr, num_threads+1);
+    pthread_barrier_init(&thread_end_barrier, nullptr, num_threads+1);
+}
 
 void LubySolver::solve(Graph &original_graph) {
     DeletableGraph uncolored_graph(original_graph);
+
+    for (int i = 0; i < num_threads; i++)
+        threads.emplace_back([&](int thread_idx, const Graph &graph) {
+            while (true) {
+                pthread_barrier_wait(&thread_start_barrier);
+                if (kill_threads)
+                    return;
+                int V_start = items_per_thread * thread_idx,
+                        V_end = items_per_thread * (thread_idx + 1);
+                if (V_start >= V_vec.size()) {
+                    pthread_barrier_wait(&thread_end_barrier);
+                    continue;
+                }
+                if (V_end >= V_vec.size())
+                    V_end = V_vec.size();
+                auto &S = partial_S[thread_idx];
+                int items_selected_here = 0;
+                while (items_selected_here == 0) {
+                    // For each vertex, include it or not with probability 1/(2/d(v))
+                    for (int j = V_start; j < V_end; j++) {
+                        auto vertex = V_vec[j];
+                        double probability = 1. / (2 * graph.degree_of(vertex));
+                        std::bernoulli_distribution d(probability);
+                        if (d(gen)) {
+                            S.push_back(vertex);
+                            S_bitmap[vertex] = true;
+                            items_selected_here++;
+                        }
+                    }
+                }
+                pthread_barrier_wait(&thread_end_barrier);
+            }
+        }, i, std::cref(original_graph));
+
     color_t color = 0;
     while (!uncolored_graph.empty()) {
         compute_MIS(uncolored_graph);
@@ -16,6 +50,11 @@ void LubySolver::solve(Graph &original_graph) {
         }
         color++;
     }
+
+    kill_threads = true;
+    pthread_barrier_wait(&thread_start_barrier);
+    for (auto &t : threads)
+        t.join();
 }
 
 // Best explained here:
@@ -52,44 +91,19 @@ void LubySolver::compute_MIS(const DeletableGraph &del_graph) {
 }
 
 void LubySolver::probabilistic_select(const Graph &graph) {
-    // Mirrors V into a vector so that each thread can work on part of it
-    std::vector<uint32_t> V_vec(V.cbegin(), V.cend());
+    V_vec = std::move(std::vector<uint32_t>(V.cbegin(), V.cend()));
     S.clear();
     S_bitmap.clear();
     S_bitmap.resize(graph.vertices.size());
-    int items_per_thread = ceil(float(V.size())/float(num_threads));
-    std::vector<std::thread> threads;
-    std::vector<std::vector<uint32_t>> partial_S(num_threads);
-    for (int i = 0; i < num_threads; i++)
-        threads.emplace_back([&](int thread_idx) {
-            int V_start = items_per_thread * thread_idx,
-                V_end = items_per_thread * (thread_idx+1);
-            if (V_start >= V_vec.size())
-                return;
-            if (V_end >= V_vec.size())
-                V_end = V_vec.size();
-            auto &S = partial_S[thread_idx];
-            int items_selected_here = 0;
-            while (items_selected_here == 0) {
-                // For each vertex, include it or not with probability 1/(2/d(v))
-                for (int j = V_start; j < V_end; j++) {
-                    auto vertex = V_vec[j];
-                    double probability = 1. / (2 * graph.degree_of(vertex));
-                    std::bernoulli_distribution d(probability);
-                    if (d(gen)) {
-                        S.push_back(vertex);
-                        S_bitmap[vertex] = true;
-                        items_selected_here++;
-                    }
-                }
-            }
-        }, i);
-    for (int i = 0; i < num_threads; i++) {
-        // Wait for each thread to finish processing its part of vertices
-        threads[i].join();
-        // Then concatenate the partial S
-        S.insert(S.end(), partial_S[i].cbegin(), partial_S[i].cend());
-    }
+    for (auto &S_ : partial_S)
+        S_.clear();
+    items_per_thread = ceil(float(V.size())/float(num_threads));
+
+    pthread_barrier_wait(&thread_start_barrier);
+    pthread_barrier_wait(&thread_end_barrier);
+    // Concatenate the partial S
+    for (const auto &partial : partial_S)
+        S.insert(S.end(), partial.cbegin(), partial.cend());
 }
 
 void LubySolver::remove_edges(const Graph &g) {

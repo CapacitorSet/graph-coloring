@@ -3,17 +3,26 @@
 
 #include <random>
 #include <set>
+#include <thread>
 #include "Solver.h"
 
 class LubySolver : public Solver {
     int num_threads;
     std::mt19937 gen;
+    std::vector<std::thread> threads;
     std::vector<uint32_t> MIS;
-    std::set<uint32_t> V;
 
     // Variables for probabilistic_select
     std::vector<uint32_t> S;
     std::vector<char> S_bitmap;
+    std::vector<std::vector<uint32_t>> partial_S;
+    std::set<uint32_t> V;
+    // Mirrors V into a vector so that each thread can work on part of it
+    std::vector<uint32_t> V_vec;
+
+    bool kill_threads;
+    pthread_barrier_t thread_start_barrier, thread_end_barrier;
+    int items_per_thread;
 
     // First step
     inline void probabilistic_select(const Graph &);
@@ -28,7 +37,6 @@ public:
     std::string name() const;
 
     void solve(Graph&);
-
 };
 
 
