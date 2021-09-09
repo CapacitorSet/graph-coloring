@@ -1,6 +1,7 @@
 #include "LubySolver.h"
 #include <algorithm>
 #include <random>
+#include <thread>
 
 LubySolver::LubySolver(int num_threads) : num_threads(num_threads), gen(RANDOM_SEED) {}
 
@@ -35,12 +36,12 @@ void LubySolver::compute_MIS(const DeletableGraph &del_graph) {
     while (!V.empty()) {
         // The subset of vertices selected
         // We use std::vector as the iterator for std::set is very slow
-        std::vector<char> S = probabilistic_select(graph);
+        probabilistic_select(graph);
 
-        remove_edges(S, graph);
+        remove_edges(graph);
 
-        for (int v = 0; v < num_vertices; v++) {
-            if (!S[v])
+        for (uint32_t v : S) {
+            if (!S_bitmap[v])
                 continue;
             MIS.emplace_back(v);
             V.erase(v);
@@ -50,30 +51,56 @@ void LubySolver::compute_MIS(const DeletableGraph &del_graph) {
     }
 }
 
-std::vector<char> LubySolver::probabilistic_select(const Graph &graph) {
-    std::vector<char> S(graph.vertices.size());
-    // For each vertex, include it or not with probability 1/(2/d(v))
-    for (uint32_t i : V) {
-        double probability = 1. / (2 * graph.degree_of(i));
-        std::bernoulli_distribution d(probability);
-        if (d(gen))
-            S[i] = true;
+void LubySolver::probabilistic_select(const Graph &graph) {
+    // Mirrors V into a vector so that each thread can work on part of it
+    std::vector<uint32_t> V_vec(V.cbegin(), V.cend());
+    S.clear();
+    S_bitmap.clear();
+    S_bitmap.resize(graph.vertices.size());
+    int items_per_thread = ceil(float(V.size())/float(num_threads));
+    std::vector<std::thread> threads;
+    std::vector<std::vector<uint32_t>> partial_S(num_threads);
+    for (int i = 0; i < num_threads; i++)
+        threads.emplace_back([&](int thread_idx) {
+            int V_start = items_per_thread * thread_idx,
+                V_end = items_per_thread * (thread_idx+1);
+            if (V_start >= V_vec.size())
+                return;
+            if (V_end >= V_vec.size())
+                V_end = V_vec.size();
+            auto &S = partial_S[thread_idx];
+            int items_selected_here = 0;
+            while (items_selected_here == 0) {
+                // For each vertex, include it or not with probability 1/(2/d(v))
+                for (int j = V_start; j < V_end; j++) {
+                    auto vertex = V_vec[j];
+                    double probability = 1. / (2 * graph.degree_of(vertex));
+                    std::bernoulli_distribution d(probability);
+                    if (d(gen)) {
+                        S.push_back(vertex);
+                        S_bitmap[vertex] = true;
+                        items_selected_here++;
+                    }
+                }
+            }
+        }, i);
+    for (int i = 0; i < num_threads; i++) {
+        // Wait for each thread to finish processing its part of vertices
+        threads[i].join();
+        // Then concatenate the partial S
+        S.insert(S.end(), partial_S[i].cbegin(), partial_S[i].cend());
     }
-    return S;
 }
 
-void LubySolver::remove_edges(std::vector<char> &S, const Graph &g) {
+void LubySolver::remove_edges(const Graph &g) {
     // Optimization: do not check for edges if we have less than 2 nodes
     if (S.size() < 2)
         return;
 
     // For each edge in E, check that "from" and "to" are in the graph.
 
-    // First, check that the "from" index is in the graph S.
-    uint32_t num_vertices = g.vertices.size();
-    for (uint32_t from = 0; from < num_vertices; from++) {
-        if (!S[from])
-            continue;
+    // First, check that the "from" index is in S.
+    for (uint32_t from : S) {
         // Then, check that the "to" index is also in S.
         /*
         // Equivalent to:
@@ -84,12 +111,12 @@ void LubySolver::remove_edges(std::vector<char> &S, const Graph &g) {
         auto &neighbors = g.neighbors_of(from);
         for (auto pos = std::lower_bound(neighbors.cbegin(), neighbors.cend(), from); pos != neighbors.cend(); ++pos) {
             uint32_t to = *pos;
-            if (!S[to])
+            if (!S_bitmap[to])
                 continue;
             if (g.degree_of(from) <= g.degree_of(to))
-                S[from] = false;
+                S_bitmap[from] = false;
             else
-                S[to] = false;
+                S_bitmap[to] = false;
         }
     }
 }

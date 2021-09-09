@@ -11,10 +11,14 @@ class LubySolver : public Solver {
     std::vector<uint32_t> MIS;
     std::set<uint32_t> V;
 
+    // Variables for probabilistic_select
+    std::vector<uint32_t> S;
+    std::vector<char> S_bitmap;
+
     // First step
-    inline std::vector<char> probabilistic_select(const Graph &);
+    inline void probabilistic_select(const Graph &);
     // Second step
-    inline void remove_edges(std::vector<char> &S, const Graph &);
+    inline void remove_edges(const Graph &);
     // Luby's algorithm
     void compute_MIS(const DeletableGraph &src);
 
