@@ -57,7 +57,9 @@ This format allows us to skip line tokenization, number tokenization, number par
 
 `LubySolver` implements the algorithm from *A simple parallel algorithm for the Maximal Independent Set problem*, M. Luby, 1985. It features two parallel steps, which we named `probabilistic_select` and `remove_edges`, and one sequential step, where the MIS is constructed. We then add a sequential step that colors the MIS, not mentioned in Luby's paper because it does not address graph coloring directly.
 
-*To do: parallelization*
+Profiling shows that very little time is actually spent in `remove_edges`, so this step was not parallelized. `probabilistic_select` on the other hand accounts for ~35% of the total runtime, and was parallelized with ease due to its unsynchronized nature: the list of candidates is split equally among threads.
+
+Because this algorithm suffers from frequent looping, we added a small optimization: each thread in `probabilistic_select` must select at least one item. Doing so has resulted in an appreciable increase in performance.
 
 #### Jones
 
