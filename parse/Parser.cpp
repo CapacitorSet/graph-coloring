@@ -1,28 +1,31 @@
 #include <chrono>
+#include <filesystem>
 #include "Parser.h"
 #include "FastParser.h"
 #include "DimacsParser.h"
 #include "Dimacs10Parser.h"
 #include "Serializer.h"
 
-Parser::Parser(const std::string &filename) {
-    std::ifstream file(filename);
+Parser::Parser(const std::string &_path) {
+    std::ifstream file(_path);
     if (!file.is_open())
         throw std::runtime_error("Failed to open file.");
 
-    if (filename.find(".fast") != std::string::npos) {
+    auto path = std::filesystem::path(_path);
+
+    if (path.extension() == ".fast") {
         serializable = false;
         parser = new FastParser(file);
-    } else if (filename.find(".graph") != std::string::npos) {
+    } else if (path.extension() == ".graph") {
         serializable = true;
-        fast_filename = filename + ".fast";
-        parser = new Dimacs10Parser(file, filename);
-    } else if (filename.find(".gra") != std::string::npos) {
+        fast_filename = _path + ".fast";
+        parser = new Dimacs10Parser(file, _path);
+    } else if (path.extension() == ".gra") {
         serializable = true;
-        fast_filename = filename + ".fast";
-        parser = new DimacsParser(file, filename);
+        fast_filename = _path + ".fast";
+        parser = new DimacsParser(file, _path);
     } else {
-        throw std::runtime_error("Unrecognized file format");
+        throw std::runtime_error("Unrecognized extension: ." + path.extension().string());
     }
 }
 
