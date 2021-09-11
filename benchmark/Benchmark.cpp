@@ -23,16 +23,37 @@ Benchmark::Benchmark(Graph &g) : solvers({
 }), graph(g) {}
 
 void Benchmark::run() {
+    // CSV header
+    if (settings.output == settings.USE_CSV)
+        printf("Solver;Time elapsed;Memory usage;Success;Colors\n");
+
     for (Solver *s : solvers) {
-        std::cout << s->name() << ":" << std::endl;
-        struct result res = run_single(s);
-        printf("%.2f ms, %.2f MB (%s, %d colors)\n\n",
-               res.milliseconds,
-               double(res.peak_mem_usage) / 1024 / 1024,
-               res.success ? "success" : "fail",
-               res.num_colors);
+        if (settings.output == settings.USE_TEXT) {
+            std::cout << s->name() << ":" << std::endl;
+            struct result res = run_single(s);
+            printf("%.2f ms, %.2f MB (%s, %d colors)\n\n",
+                   res.milliseconds,
+                   double(res.peak_mem_usage) / 1024 / 1024,
+                   res.success ? "success" : "fail",
+                   res.num_colors);
+        } else if (settings.output == settings.USE_CSV || settings.output == settings.USE_CSV_COMPACT) {
+            std::cout << s->name() << ";";
+            struct result res = run_single(s);
+            printf("%.2f;%.2f;%d;%d",
+                   res.milliseconds,
+                   double(res.peak_mem_usage) / 1024 / 1024,
+                   res.success,
+                   res.num_colors);
+            if (settings.output == settings.USE_CSV)
+                std::cout << std::endl;
+            else
+                std::cout << ";";
+            std::cout.flush();
+        }
         delete s;
     }
+    if (settings.output == settings.USE_CSV_COMPACT)
+        std::cout << std::endl;
 }
 
 struct result Benchmark::run_single(Solver *solver) {

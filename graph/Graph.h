@@ -14,6 +14,7 @@ class Graph {
 
     friend class DeletableGraph;
     friend class Serializer;
+    friend class Parser;
 
     friend class SequentialSolver;
     friend class LubySolver;

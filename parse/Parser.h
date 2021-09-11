@@ -16,7 +16,14 @@ class Parser {
     std::string fast_filename;
 
 public:
+    using metadata_t = struct {
+        std::string filename;
+        int num_vertices, num_edges;
+    };
+
     double milliseconds;
+
+    metadata_t metadata;
 
     Parser(const std::string &filename);
     ~Parser();

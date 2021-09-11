@@ -27,6 +27,7 @@ Parser::Parser(const std::string &_path) {
     } else {
         throw std::runtime_error("Unrecognized extension: ." + path.extension().string());
     }
+    metadata.filename = path.filename().string();
 }
 
 Parser::~Parser() {
@@ -39,6 +40,9 @@ Graph Parser::parse() {
     Graph g = parser->parse();
     auto t2 = std::chrono::high_resolution_clock::now();
     milliseconds = std::chrono::duration<double, std::milli>(t2 - t1).count();
+    metadata.num_vertices = g.vertices.size();
+    for (const auto &neighbors : g.vertices)
+        metadata.num_edges += neighbors.size();
     // If we're not using FastParser, serialize the graph to a .fast file
     if (serializable) {
         std::ofstream fast_file(fast_filename);

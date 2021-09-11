@@ -23,6 +23,10 @@ public:
     Benchmark(Graph &);
 
     void run();
+
+    struct {
+        enum {USE_TEXT, USE_CSV, USE_CSV_COMPACT} output;
+    } settings;
 };
 
 
