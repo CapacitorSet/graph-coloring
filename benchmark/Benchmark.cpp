@@ -11,12 +11,14 @@
 
 Benchmark::Benchmark(Graph &g) : solvers({
     new SequentialSolver(),
-    new LubySolver(),
+    new LubySolver(1),
+    new LubySolver(2),
+    new LubySolver(4),
     new JonesSolver(1),
     new JonesSolver(2),
     new JonesSolver(4),
-    new RandomPrioritySolver(),
-    new LDFsolverParallel(1),
+//    new RandomPrioritySolver(),
+//    new LDFsolverParallel(1),
     new LDFsolver(),
 }), graph(g) {}
 
