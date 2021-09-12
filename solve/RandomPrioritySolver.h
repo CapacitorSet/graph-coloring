@@ -12,17 +12,14 @@
 
 class RandomPrioritySolver : public Solver {
     int num_threads;
-    std::vector<uint32_t> Random_Priority_Vec;
+    std::vector<float> Random_Priority_Vec;
     std::vector<bool> Destroy_Vec;
     std::vector<uint32_t> MIS;
     std::vector<uint32_t> Remaining_Vertices;
 
     std::mutex wrt_mutex;
-    // Synchronization object
-    pthread_barrier_t   barrier1;
-    pthread_barrier_t   barrier2;
 
-    void compute_MIS(const DeletableGraph &src);
+    void compute_MIS(const Graph &src);
 
 public:
     RandomPrioritySolver(int num_threads = 1);

@@ -3,13 +3,16 @@
 RandomPrioritySolver::RandomPrioritySolver(int num_threads) : num_threads(num_threads) {}
 
 void RandomPrioritySolver::solve(Graph &original_graph) {
-    DeletableGraph uncolored_graph(original_graph);
+    Graph uncolored_graph(original_graph);
     color_t color = 0;
+
+    srand((unsigned) time(NULL));
+
     while (!uncolored_graph.empty()) {
         compute_MIS(uncolored_graph);
         for (uint32_t vertex : MIS) {
             original_graph.colors[vertex] = color;
-            uncolored_graph.delete_vertex(vertex);
+            uncolored_graph.remove_vertex(vertex);
         }
         color++;
     }
@@ -18,22 +21,21 @@ void RandomPrioritySolver::solve(Graph &original_graph) {
 // Best explained here:
 // https://en.wikipedia.org/wiki/Maximal_independent_set#Random-priority_parallel_algorithm
 
-void RandomPrioritySolver::compute_MIS(const DeletableGraph &del_graph) {
+void RandomPrioritySolver::compute_MIS(const Graph &src) {
     // Reset solver state
     MIS.clear();
     Remaining_Vertices.clear();
 
-    const Graph &graph = del_graph.graph;
-    uint32_t num_verticies_graph = graph.vertices.size();
+    uint32_t num_verticies_graph = src.vertices.size();
 
     for (uint32_t i = 0; i < num_verticies_graph; i++) {
         // It suffices to check for is_deleted here, since we don't delete vertices inside the function
-        if (!del_graph.is_deleted(i)) {
+        if (!src.is_deleted(i)) {
             Remaining_Vertices.emplace_back(i);
         }
     }
 
-    uint32_t num_vertices_Remaining = Remaining_Vertices.size();
+    uint32_t num_vertices_Remaining;
 
     Random_Priority_Vec.reserve(num_verticies_graph);
 
@@ -42,61 +44,102 @@ void RandomPrioritySolver::compute_MIS(const DeletableGraph &del_graph) {
     while (!Remaining_Vertices.empty()) {
         std::vector<std::thread> threadPool;
 
-        pthread_barrier_init(&barrier1, NULL, num_vertices_Remaining);
-        pthread_barrier_init(&barrier2, NULL, num_vertices_Remaining);
+        // Synchronization objects
+        pthread_barrier_t   barrier1;
+        pthread_barrier_t   barrier2;
 
-        for (uint32_t thID = 0; thID < num_vertices_Remaining; thID++) {
-            threadPool.emplace_back(std::thread([&thID, &graph, this] () {
+        num_vertices_Remaining = Remaining_Vertices.size();
 
-                uint32_t vertexID = Remaining_Vertices[thID];
+        uint32_t vertices_per_thread = num_vertices_Remaining / num_threads;
+        uint32_t remaining_vertices = num_vertices_Remaining % num_threads;
 
-                // Select random number
-                uint32_t RandNum = rand() % 100;
+        pthread_barrier_init(&barrier1, NULL, num_threads);
+        pthread_barrier_init(&barrier2, NULL, num_threads);
 
-                // Send it to the neighbours "Announce it"
-                Random_Priority_Vec[vertexID] = RandNum;
+        if(num_threads > std::thread::hardware_concurrency()) {
+            perror("Very large number of threads!! Please, use a smaller number of threads!\n");
+        }
 
-                edges_t neighbors = graph.neighbors_of(vertexID);
-                edges_t remaining_neighbors;
-                bool IamTheSmallest = true;
+        else if(num_threads > num_vertices_Remaining) {
+            perror("The entered number of threads is larger than number of vertices!! Please, use a number that is less than or equal the number of vertices\n");
+        }
 
-                pthread_barrier_wait(&barrier1);
+        else {
+            uint32_t vertex = 0;
+            uint32_t range = vertices_per_thread;
+            uint32_t thread_counter = num_threads;
 
-                for (uint32_t neighbor : neighbors) {
-                    if (std::find(Remaining_Vertices.begin(), Remaining_Vertices.end(), neighbor) != Remaining_Vertices.end()) {
-                        remaining_neighbors.emplace_back(neighbor);
-                        if (Random_Priority_Vec[neighbor] < RandNum) {
-                            IamTheSmallest = false;
-                            break;
+            while(thread_counter) {
+
+                if(thread_counter == 1){
+                    range = vertices_per_thread + remaining_vertices;
+                }
+
+                threadPool.emplace_back(std::thread([vertex, &range, &src, &barrier1, &barrier2, this] () {
+                    uint32_t vertexID = vertex;
+
+                    /** Each vertex selects a random number and announce it by saving it in a shared vector **/
+                    for(uint32_t i = 0; i < range; i++) {
+                        Random_Priority_Vec[vertexID] = rand() / RAND_MAX;
+                        vertexID++;
+                    }
+
+                    /** Synchronization Point **/
+                    pthread_barrier_wait(&barrier1);
+
+                    vertexID = vertex;
+                    edges_t neighbors;
+                    edges_t Remaining_Neighbors;
+
+                    for(uint32_t i = 0; i < range; i++) {
+
+                        neighbors = src.neighbors_of(vertexID);
+                        bool IamSmallest = true;
+
+                        for(uint32_t neighbor : neighbors) {
+                            if (std::find(Remaining_Vertices.begin(), Remaining_Vertices.end(), neighbor) != Remaining_Vertices.end()) {
+                                Remaining_Neighbors.emplace_back(neighbor);
+                                if(Random_Priority_Vec[neighbor] < Random_Priority_Vec[vertexID]) {
+                                    IamSmallest = false;
+                                    break;
+                                }
+                            }
                         }
+
+                        if(IamSmallest) {
+
+                            /** Insert itself in MIS **/
+                            wrt_mutex.lock();
+                            MIS.emplace_back(vertexID);
+                            wrt_mutex.unlock();
+
+                            /** Remove itself from Remaining_Verticies **/
+                            std::remove(Remaining_Vertices.begin(), Remaining_Vertices.end(), vertexID);
+
+                            /**  Inform Neighbors about Removal **/
+                            for(uint32_t remaining_neighbor : Remaining_Neighbors) {
+                                Destroy_Vec[remaining_neighbor] = true;
+                            }
+                        }
+                        vertexID++;
                     }
-                }
 
-                if (IamTheSmallest) {
+                    /** Synchronization Point **/
+                    pthread_barrier_wait(&barrier2);
 
-                    // Insert itself into MIS
-                    wrt_mutex.lock();
-                    MIS.emplace_back(vertexID);
-                    wrt_mutex.unlock();
-
-                    // Remove itself from Remaining_Vertices
-                    std::remove(Remaining_Vertices.begin(), Remaining_Vertices.end(), vertexID);
-
-                    // Tells the neighbors
-                    for (uint32_t neighbor : remaining_neighbors) {
-                        wrt_mutex.lock();
-                        Destroy_Vec[neighbor] = true;
-                        wrt_mutex.unlock();
+                    /** if a neighbor is removed, remove it self **/
+                    vertexID = vertex;
+                    for(uint32_t i = 0; i < range; i++) {
+                        if(Destroy_Vec[vertexID]) {
+                            std::remove(Remaining_Vertices.begin(), Remaining_Vertices.end(), vertexID);
+                        }
+                        vertexID++;
                     }
-                }
+                }));
 
-                pthread_barrier_wait(&barrier2);
-
-                if (Destroy_Vec[vertexID] == true) {
-                    // Remove itself from Remaining_Vertices
-                    std::remove(Remaining_Vertices.begin(), Remaining_Vertices.end(), vertexID);
-                }
-            }));
+                vertex += vertices_per_thread;
+                thread_counter--; 
+            }
         }
 
         for (auto &th : threadPool) {
@@ -106,10 +149,5 @@ void RandomPrioritySolver::compute_MIS(const DeletableGraph &del_graph) {
 }
 
 std::string RandomPrioritySolver::name() const {
-
     return "RandomPrioritySolver (" + std::to_string(num_threads) + " threads)";
-
 }
-
-
-
