@@ -30,7 +30,7 @@ void LDFsolverParallel::solve(Graph &original_graph) {
 
             thread_Pool.emplace_back(std::thread([vertex, &range, &original_graph, &degrees, this]() {
                 uint32_t vertexTh = vertex;
-                for(int i = 0; i < range; i++) {
+                for(uint32_t i = 0; i < range; i++) {
                     // Each vertex computes its degree and announce it.
                     degrees[vertexTh] = original_graph.degree_of(vertexTh);
                     vertexTh++;
@@ -40,13 +40,6 @@ void LDFsolverParallel::solve(Graph &original_graph) {
             vertex += vertices_per_thread;
             thread_counter--; 
         }
-    }
-
-    for (uint32_t vertex = 0; vertex < num_vertices; vertex++) {
-        thread_Pool.emplace_back(std::thread([&vertex, &original_graph, &degrees, this]() {
-            // Each vertex computes its degree and announce it.
-            degrees[vertex] = original_graph.degree_of(vertex);
-        }));
     }
 
     for (auto &th : thread_Pool) {
