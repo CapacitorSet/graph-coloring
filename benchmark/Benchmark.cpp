@@ -5,21 +5,29 @@
 #include "../solve/SequentialSolver.h"
 #include "../solve/LubySolver.h"
 #include "../solve/JonesSolver.h"
-#include "../solve/RandomPrioritySolver.h"
 #include "../solve/LDFsolver.h"
 #include "../solve/LDFsolverParallel.h"
+#include "../solve/SDLsolverParallel.h"
 
 Benchmark::Benchmark(Graph &g) : solvers({
     new SequentialSolver(),
     new LubySolver(1),
     new LubySolver(2),
+    new LubySolver(3),
     new LubySolver(4),
     new JonesSolver(1),
     new JonesSolver(2),
+    new JonesSolver(3),
     new JonesSolver(4),
-//    new RandomPrioritySolver(),
-//    new LDFsolverParallel(1),
     new LDFsolver(),
+    new SDLsolverParallel(1),
+    new SDLsolverParallel(2),
+    new SDLsolverParallel(3),
+    new SDLsolverParallel(4),
+    new LDFsolverParallel(1),
+    new LDFsolverParallel(2),
+    new LDFsolverParallel(3),
+    new LDFsolverParallel(4),
 }), graph(g) {}
 
 void Benchmark::run() {

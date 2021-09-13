@@ -14,7 +14,7 @@ add_executable(graph_coloring
         solve/SequentialSolver.cpp solve/SequentialSolver.h
         solve/LubySolver.cpp solve/LubySolver.h
         solve/JonesSolver.cpp solve/JonesSolver.h
-        solve/RandomPrioritySolver.cpp solve/RandomPrioritySolver.h
+        solve/SDLsolverParallel.cpp solve/SDLsolverParallel.h
         solve/LDFsolver.cpp solve/LDFsolver.h
         solve/LDFsolverParallel.cpp solve/LDFsolverParallel.h
         benchmark/Benchmark.cpp benchmark/Benchmark.h
