@@ -8,6 +8,7 @@
 #include "../solve/LDFsolver.h"
 #include "../solve/LDFsolverParallel.h"
 #include "../solve/SDLsolverParallel.h"
+#include "../solve/SDLsequentialSolver.h"
 
 Benchmark::Benchmark(Graph &g) : solvers({
     new SequentialSolver(),
@@ -20,6 +21,7 @@ Benchmark::Benchmark(Graph &g) : solvers({
     new JonesSolver(3),
     new JonesSolver(4),
     new LDFsolver(),
+    new SDLsequentialSolver(),
     new SDLsolverParallel(1),
     new SDLsolverParallel(2),
     new SDLsolverParallel(3),

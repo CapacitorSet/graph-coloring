@@ -22,6 +22,7 @@ class Graph {
     friend class LDFsolver;
     friend class LDFsolverParallel;
     friend class SDLsolverParallel;
+    friend class SDLsequentialSolver;
 
 public:
     Graph(std::vector<edges_t> &&_vertices);
