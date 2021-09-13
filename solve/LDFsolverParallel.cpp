@@ -32,12 +32,12 @@ void LDFsolverParallel::compute_degrees_in_parallel(Graph &original_graph, std::
     uint32_t vertices_per_thread = num_vertices / num_threads;
     uint32_t remaining_vertices = num_vertices % num_threads;
 
-    /* if a number of threads larger than the ability of the system */
+    /* if a number of threads larger than the ability of the system, generate error */
     if(num_threads > std::thread::hardware_concurrency()) {
         perror("Very large number of threads!! Please, use a smaller number of threads!\n");
         exit(0);
     }
-    /* if a number of threads greater than the number of vertices */
+    /* if a number of threads greater than the number of vertices, generate error */
     else if(num_threads > num_vertices) {
         perror("The entered number of threads is larger than number of vertices!! Please, use a number that is less than or equal the number of vertices\n");
         exit(0);

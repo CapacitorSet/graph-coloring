@@ -17,29 +17,42 @@ void SDLsolverParallel::solve(Graph &graph) {
 
 void SDLsolverParallel::weighting_phase(std::vector<uint32_t> &degrees, std::vector<uint32_t> &weights, Graph &original_graph, uint32_t &num_vertices) {
     std::vector<std::thread> thread_Pool;
-
+    
+    /* computing the number of vertices to be done per one thread */
     uint32_t vertices_per_thread = num_vertices / num_threads;
     uint32_t remaining_vertices = num_vertices % num_threads;
 
+    /* if a number of threads larger than the ability of the system, generate error */
     if(num_threads > std::thread::hardware_concurrency()) {
         perror("Very large number of threads!! Please, use a smaller number of threads!\n");
         exit(0);
     }
+
+    /* if a number of threads greater than the number of vertices, generate error */
     else if(num_threads > num_vertices) {
         perror("The entered number of threads is larger than number of vertices!! Please, use a number that is less than or equal the number of vertices\n");
         exit(0);
     }
+
     else {
+
+        /* Each thread has a vertex to start from and a range of vertices to work on */
         uint32_t vertex = 0;
         uint32_t range = vertices_per_thread;
         uint32_t thread_counter = num_threads;
 
+        /* Initializing the synchronization points with number of threads equal to num_threads + the main thread */
         pthread_barrier_init(&barrier1, NULL, num_threads + 1);
         pthread_barrier_init(&barrier2, NULL, num_threads + 1);
 
+        /* counter of the number of threads finished the work */
         uint32_t counter = 0;
+
+        /* The weight and the degree the threads are dealing with. They are initialized to zero at the beginning */
         uint32_t globalWeight = 0;
         uint32_t globalDegree = 0;
+
+        /* Maximum degree should each thread stop at. It is initialized now arbitrary to be assigned later by the main thread */
         uint32_t max_degree = 0;
 
         while(thread_counter) {
@@ -50,21 +63,23 @@ void SDLsolverParallel::weighting_phase(std::vector<uint32_t> &degrees, std::vec
 
             thread_Pool.emplace_back(std::thread([vertex, &range, &original_graph, &degrees, &weights, &counter, &globalDegree, &globalWeight, &max_degree, this]() {
 
+                /*Each vertex computes its degree and announcing it by saving it in a shared vector */
                 uint32_t vertexID = vertex;
                 for(uint32_t i = 0; i < range; i++) {
-
-                    // Each vertex computes its degree and announce it.
                     degrees[vertexID] = original_graph.degree_of(vertexID);
                     vertexID++;
                 }
 
-                /** Synchronization Points **/
+                /* Synchronization Point */
                 pthread_barrier_wait(&barrier1);
+
+                /* Waiting until the main thread computes the max_degree */
                 pthread_barrier_wait(&barrier2);
 
 
                 edges_t neighbors;
                 
+                /* Keep working till the globalDegree reached the max degree */ 
                 while(globalDegree <= max_degree) {
                     std::unique_lock lock {m};
                     for(uint32_t i = 0; i < range; i++) {
@@ -81,13 +96,16 @@ void SDLsolverParallel::weighting_phase(std::vector<uint32_t> &degrees, std::vec
                         vertexID++;
                     }
 
+                    /* Telling other threads that the current thread has finished iteration by increasing the "counter" */
                     wrt_mutex.lock();
                     counter++;
                     wrt_mutex.unlock();
 
+                    /* if I am not the last thread finished this iteration, wait */
                     if(counter < num_threads) {
                         cv.wait(lock);
                     }
+                    /* if the last thread, reset the counter and increment globalWeight and globalDegree, and wake up all thread to continue working */
                     else {
                         counter = 0;
                         globalWeight++;
@@ -102,16 +120,19 @@ void SDLsolverParallel::weighting_phase(std::vector<uint32_t> &degrees, std::vec
             thread_counter--; 
         }
 
-        /** Synchronization Points **/
+        /* Synchronization points to compute the maximum degree before the working threads continue their work */
+        
         pthread_barrier_wait(&barrier1);
+
         for(uint32_t degree : degrees) {
             if(degree > max_degree) {
                 max_degree = degree;
             }
         }
+
         pthread_barrier_wait(&barrier2);   
 
-
+        /* Wait for all working threads until they finish their work */
         for (auto &th : thread_Pool) {
             th.join();
         }
