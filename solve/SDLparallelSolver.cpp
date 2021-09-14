@@ -1,9 +1,9 @@
-#include "SDLsolverParallel.h"
+#include "SDLparallelSolver.h"
 #include <stdio.h>
 
-SDLsolverParallel::SDLsolverParallel(int num_threads) : num_threads(num_threads) {}
+SDLparallelSolver::SDLparallelSolver(int num_threads) : num_threads(num_threads) {}
 
-void SDLsolverParallel::solve(Graph &graph) {
+void SDLparallelSolver::solve(Graph &graph) {
     uint32_t num_vertices = graph.vertices.size();
     std::vector<uint32_t> degrees(num_vertices, 0);
     std::vector<uint32_t> weights(num_vertices, 0);
@@ -15,7 +15,7 @@ void SDLsolverParallel::solve(Graph &graph) {
     coloring_phase(weights, graph);
 }
 
-void SDLsolverParallel::weighting_phase(std::vector<uint32_t> &degrees, std::vector<uint32_t> &weights, Graph &original_graph, uint32_t &num_vertices) {
+void SDLparallelSolver::weighting_phase(std::vector<uint32_t> &degrees, std::vector<uint32_t> &weights, Graph &original_graph, uint32_t &num_vertices) {
     std::vector<std::thread> thread_Pool;
     
     /* computing the number of vertices to be done per one thread */
@@ -140,7 +140,7 @@ void SDLsolverParallel::weighting_phase(std::vector<uint32_t> &degrees, std::vec
     }
 }
 
-void SDLsolverParallel::coloring_phase(std::vector<uint32_t> &weights, Graph &original_graph){
+void SDLparallelSolver::coloring_phase(std::vector<uint32_t> &weights, Graph &original_graph){
 
     /* Create a vector to represent the vertices to be colored in order and intialize it in ascending order */
     std::vector<uint32_t> vertices_to_be_colored(weights.size());
@@ -158,6 +158,6 @@ void SDLsolverParallel::coloring_phase(std::vector<uint32_t> &weights, Graph &or
 
 }
 
-std::string SDLsolverParallel::name() const {
-    return "SDLsolverParallel (" + std::to_string(num_threads) + " threads)";
+std::string SDLparallelSolver::name() const {
+    return "SDLparallelSolver (" + std::to_string(num_threads) + " threads)";
 }

@@ -1,13 +1,13 @@
-#ifndef GRAPH_COLORING_LDFSOLVER_H
-#define GRAPH_COLORING_LDFSOLVER_H
+#ifndef GRAPH_COLORING_LDFSEQUENTIALSOLVER_H
+#define GRAPH_COLORING_LDFSEQUENTIALSOLVER_H
 
 #include "Solver.h"
 
-class LDFsolver : public Solver {
+class LDFsequentialSolver : public Solver {
     int num_threads;
 
 public:
-    LDFsolver(int num_threads = 1);
+    LDFsequentialSolver(int num_threads = 1);
 
     std::string name() const;
 

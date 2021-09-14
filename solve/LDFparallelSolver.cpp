@@ -1,9 +1,9 @@
-#include "LDFsolverParallel.h"
+#include "LDFparallelSolver.h"
 #include <stdio.h>
 
-LDFsolverParallel::LDFsolverParallel(int num_threads) : num_threads(num_threads) {}
+LDFparallelSolver::LDFparallelSolver(int num_threads) : num_threads(num_threads) {}
 
-void LDFsolverParallel::solve(Graph &graph) {
+void LDFparallelSolver::solve(Graph &graph) {
 
     uint32_t num_vertices = graph.vertices.size();
 
@@ -25,7 +25,7 @@ void LDFsolverParallel::solve(Graph &graph) {
     }
 }
 
-void LDFsolverParallel::compute_degrees_in_parallel(Graph &original_graph, std::vector<uint32_t> &degrees, uint32_t num_vertices) {
+void LDFparallelSolver::compute_degrees_in_parallel(Graph &original_graph, std::vector<uint32_t> &degrees, uint32_t num_vertices) {
     std::vector<std::thread> thread_Pool;
 
     /* computing the number of vertices to be done per one thread */
@@ -78,7 +78,7 @@ void LDFsolverParallel::compute_degrees_in_parallel(Graph &original_graph, std::
 }
 
 
-void LDFsolverParallel::order_vertices_to_be_colored(std::vector<uint32_t> &degrees, std::vector<uint32_t> &vertices_to_color) {
+void LDFparallelSolver::order_vertices_to_be_colored(std::vector<uint32_t> &degrees, std::vector<uint32_t> &vertices_to_color) {
 
     /* Intialize the vector in an ascending order */
     std::iota(vertices_to_color.begin(), vertices_to_color.end(), 0);
@@ -89,7 +89,7 @@ void LDFsolverParallel::order_vertices_to_be_colored(std::vector<uint32_t> &degr
     });
 }
 
-std::string LDFsolverParallel::name() const {
-    return "LDFsolverParallel (" + std::to_string(num_threads) + " threads)";
+std::string LDFparallelSolver::name() const {
+    return "LDFparallelSolver (" + std::to_string(num_threads) + " threads)";
 }
 

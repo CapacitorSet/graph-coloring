@@ -14,10 +14,10 @@ add_executable(graph_coloring
         solve/SequentialSolver.cpp solve/SequentialSolver.h
         solve/LubySolver.cpp solve/LubySolver.h
         solve/JonesSolver.cpp solve/JonesSolver.h
-        solve/SDLsolverParallel.cpp solve/SDLsolverParallel.h
-        solve/LDFsolver.cpp solve/LDFsolver.h
-        colve/SDLsequentialSolver.cpp solve/SDLsequentialSolver.h
-        solve/LDFsolverParallel.cpp solve/LDFsolverParallel.h
+        solve/SDLsequentialSolver.cpp solve/SDLsequentialSolver.h
+        solve/SDLparallelSolver.cpp solve/SDLparallelSolver.h
+        solve/LDFsequentialSolver.cpp solve/LDFsequentialSolver.h
+        solve/LDFparallelSolver.cpp solve/LDFparallelSolver.h
         benchmark/Benchmark.cpp benchmark/Benchmark.h
         benchmark/MemoryMonitor.cpp benchmark/MemoryMonitor.h
         utils/PCVector.h

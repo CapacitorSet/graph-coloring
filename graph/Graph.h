@@ -19,9 +19,9 @@ class Graph {
     friend class SequentialSolver;
     friend class LubySolver;
     friend class JonesSolver;
-    friend class LDFsolver;
-    friend class LDFsolverParallel;
-    friend class SDLsolverParallel;
+    friend class LDFsequentialSolver;
+    friend class LDFparallelSolver;
+    friend class SDLparallelSolver;
     friend class SDLsequentialSolver;
 
 public:

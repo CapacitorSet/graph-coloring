@@ -1,5 +1,5 @@
-#ifndef GRAPH_COLORING_SDLSOLVERPARALLEL_H
-#define GRAPH_COLORING_SDLSOLVERPARALLEL_H
+#ifndef GRAPH_COLORING_SDLPARALLELSOLVER_H
+#define GRAPH_COLORING_SDLPARALLELSOLVER_H
 
 #include "Solver.h"
 #include <random>
@@ -14,7 +14,7 @@
 #include<condition_variable>
 #include <pthread.h>
 
-class SDLsolverParallel : public Solver {
+class SDLparallelSolver : public Solver {
     uint32_t num_threads;
 
     std::mutex m;
@@ -27,7 +27,7 @@ class SDLsolverParallel : public Solver {
     void coloring_phase(std::vector<uint32_t> &weights, Graph &original_graph);
 
 public:
-    SDLsolverParallel(int num_threads);
+    SDLparallelSolver(int num_threads);
 
     std::string name() const;
 

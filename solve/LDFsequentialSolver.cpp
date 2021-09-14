@@ -1,9 +1,9 @@
-#include "LDFsolver.h"
+#include "LDFsequentialSolver.h"
 #include <numeric>
 
-LDFsolver::LDFsolver(int num_threads) : num_threads(num_threads) {}
+LDFsequentialSolver::LDFsequentialSolver(int num_threads) : num_threads(num_threads) {}
 
-void LDFsolver::solve(Graph &graph) {
+void LDFsequentialSolver::solve(Graph &graph) {
     std::vector<uint32_t> vertices_to_color = compute_vertices_to_color_in_order(graph);
 
     for (uint32_t vertex_to_color : vertices_to_color) {
@@ -11,7 +11,7 @@ void LDFsolver::solve(Graph &graph) {
     }
 }
 
-std::vector<uint32_t> LDFsolver::compute_vertices_to_color_in_order(const Graph &graph) {
+std::vector<uint32_t> LDFsequentialSolver::compute_vertices_to_color_in_order(const Graph &graph) {
     std::vector<uint32_t> vertices_to_color(graph.vertices.size());
     std::iota(vertices_to_color.begin(), vertices_to_color.end(), 0);
     std::stable_sort(vertices_to_color.begin(), vertices_to_color.end(), [&](int i, int j) {
@@ -20,7 +20,7 @@ std::vector<uint32_t> LDFsolver::compute_vertices_to_color_in_order(const Graph 
     return vertices_to_color;
 }
 
-std::string LDFsolver::name() const
+std::string LDFsequentialSolver::name() const
 {
-    return "LDFsolver (" + std::to_string(num_threads) + " threads)";
+    return "LDFsequentialSolver (" + std::to_string(num_threads) + " threads)";
 }
