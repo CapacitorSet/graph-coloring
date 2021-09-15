@@ -16,8 +16,8 @@
 class LDFparallelSolver : public Solver {
     uint32_t num_threads;
     
-    void order_vertices_to_be_colored(std::vector<uint32_t> &degrees, std::vector<uint32_t> &vertices_to_color);
-    void compute_degrees_in_parallel(Graph &original_graph, std::vector<uint32_t> &degrees, uint32_t num_vertices);
+    void compute_degrees(Graph &original_graph, std::vector<uint32_t> &degrees, const uint32_t vertex, const uint32_t &upper_bound);
+    void coloring_in_parallel(std::vector<uint32_t> &degrees, uint32_t vertex, const uint32_t range, Graph &original_graph);
 
 public:
     LDFparallelSolver(int num_threads);
