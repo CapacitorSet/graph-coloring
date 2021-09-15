@@ -15,10 +15,11 @@ int main(int argc, char **argv) {
     Parser p(args.back());
     Graph graph = p.parse();
     if (use_csv) {
-        std::cout << p.metadata.filename << ";" << std::to_string(p.metadata.num_vertices) << ";"
-            << std::to_string(p.metadata.num_edges) << ";";
-        if (parse_only)
+        if (parse_only) {
+            std::cout << p.metadata.filename << ";" << std::to_string(p.metadata.num_vertices) << ";"
+                << std::to_string(p.metadata.num_edges) << ";";
             std::cout << std::to_string(long(p.milliseconds)) << std::endl;
+        }
     } else {
         std::cout << "Parsed in " << std::to_string(long(p.milliseconds)) << " ms." << std::endl;
     }
@@ -26,8 +27,10 @@ int main(int argc, char **argv) {
         return 0;
 
     Benchmark bench(graph);
-    if (use_csv)
-        bench.settings.output = bench.settings.USE_CSV_COMPACT;
+    if (use_csv) {
+        bench.settings.output = bench.settings.USE_CSV;
+        bench.settings.parse_md = &p.metadata;
+    }
     bench.run();
     return 0;
 }

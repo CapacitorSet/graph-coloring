@@ -1,7 +1,7 @@
 #ifndef GRAPH_COLORING_BENCHMARK_H
 #define GRAPH_COLORING_BENCHMARK_H
 
-#include <future>
+#include "../parse/Parser.h"
 #include "../solve/Solver.h"
 
 struct result {
@@ -26,6 +26,7 @@ public:
 
     struct {
         enum {USE_TEXT, USE_CSV, USE_CSV_COMPACT} output;
+        Parser::metadata_t *parse_md;
     } settings;
 };
 

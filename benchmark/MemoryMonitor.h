@@ -2,6 +2,7 @@
 #define GRAPH_COLORING_MEMORYMONITOR_H
 
 #include <cstdint>
+#include <thread>
 
 class MemoryMonitor {
     int64_t peak_usage, baseline;
