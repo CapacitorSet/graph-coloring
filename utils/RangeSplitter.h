@@ -2,6 +2,7 @@
 #define GRAPH_COLORING_RANGESPLITTER_H
 
 #include "span-lite.hpp"
+#include <cmath>
 #include <vector>
 
 class RangeSplitter {
@@ -10,7 +11,7 @@ class RangeSplitter {
 
 public:
     RangeSplitter(int max, int num_ranges) : max(max) {
-        items_per_range = ceil(double(max)/double(num_ranges));
+        items_per_range = std::ceil(float(max)/float(num_ranges));
     };
 
     // Get the lower end for the i-th range
