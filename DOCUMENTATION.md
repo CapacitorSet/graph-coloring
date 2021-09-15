@@ -4,7 +4,22 @@ This project investigates the implementation of several parallel algorithms for 
 
 ## Overview
 
-The project is organized into parsers (`parse/`), solvers (`solve/`), and benchmarking utilities (`benchmark/`). `graph/` contains the data structure and some utility functions for storing graphs as an adjacency list; finally, `utils/PCVector.h` contains a queue that supports several producers and consumers, which is a common parallelization primitive.
+The project is organized into parsers (`parse/`), solvers (`solve/`), parallelization utilities (`utils/`), and benchmarking utilities (`benchmark/`). Finally, `graph/` contains the data structure and some utility functions for storing graphs as an adjacency list.
+
+### Parallelization primitives
+
+#### PCVector
+
+`PCVector` implements the common producer-consumer scheme. However, it has some differences with respect to the standard solution based on circular buffers:
+
+ - PCVector implements a queue of arbitrary length, so it does not have an `empty` semaphore.
+ - `stop()` is used to signal that there are no more items to be produced. This lets workers exit when the queue is empty.
+
+We note that PCVector may be used to build an efficient thread pool mechanism. This primitive is not exposed directly as it is not used elsewhere, but it forms the basis for the `onReceive` method: it maintains a pool of consumers with a given callback.
+
+#### RangeSplitter
+
+`RangeSplitter` is used to split a numeric range into equal parts, accounting for possible edge cases. `VectorSplitter` does the same with vectors, and returns a span for a given thread to work on (we imported the span-lite library to enable support for `std::span`).
 
 ### Graph representation
 
@@ -89,13 +104,6 @@ struct result {
 ```
 
 The memory usage is monitored by spawning a `MemoryMonitor` thread that will read the current usage every 100 us. At this time only Linux is supported via `/proc/self/statm`.
-
-### PCVector
-
-`PCVector` implements the common producer-consumer scheme. However, it has some differences with respect to the standard solution based on circular buffers:
-
- - PCVector implements a queue of arbitrary length, so it does not have an `empty` semaphore.
- - `stop()` is used to signal that there are no more items to be produced. This lets workers exit when the queue is empty.
 
 ## Results
 
