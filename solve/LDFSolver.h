@@ -6,7 +6,7 @@
 class LDFSolver : public Solver {
     uint32_t num_threads;
     
-    void coloring_in_parallel(std::vector<uint32_t> &degrees, uint32_t vertex, uint32_t range, Graph &original_graph);
+    void coloring_in_parallel(uint32_t from, uint32_t to, Graph &graph);
 
 public:
     LDFSolver(int num_threads);
@@ -18,4 +18,4 @@ public:
 };
 
 
-#endif //GRAPH_COLORING_LDFSOLVERPARALLEL_H
+#endif //GRAPH_COLORING_LDFSOLVER_H
