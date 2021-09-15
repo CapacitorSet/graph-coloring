@@ -5,35 +5,37 @@ LubySolver::LubySolver(int num_threads) : num_threads(num_threads), partial_S(nu
     pthread_barrier_init(&thread_end_barrier, nullptr, num_threads+1);
 }
 
+LubySolver::~LubySolver() {
+    pthread_barrier_destroy(&thread_start_barrier);
+    pthread_barrier_destroy(&thread_end_barrier);
+    delete V_splitter;
+}
+
 void LubySolver::solve(Graph &original_graph) {
     DeletableGraph uncolored_graph(original_graph);
 
+    // We create the threads here, but they are only "activated" by the barrier in probabilistic_select.
     for (int i = 0; i < num_threads; i++)
         threads.emplace_back([&](int thread_idx, const Graph &graph) {
             while (true) {
                 pthread_barrier_wait(&thread_start_barrier);
+                // Used to prevent threads from looping forever
                 if (kill_threads)
                     return;
-                int V_start = items_per_thread * thread_idx,
-                        V_end = items_per_thread * (thread_idx + 1);
-                if (V_start >= V_vec.size()) {
-                    pthread_barrier_wait(&thread_end_barrier);
-                    continue;
-                }
-                if (V_end >= V_vec.size())
-                    V_end = V_vec.size();
-                auto &S = partial_S[thread_idx];
-                int items_selected_here = 0;
-                while (items_selected_here == 0) {
-                    // For each vertex, include it or not with probability 1/(2/d(v))
-                    for (int j = V_start; j < V_end; j++) {
-                        auto vertex = V_vec[j];
-                        double probability = 1. / (2 * graph.degree_of(vertex));
-                        std::bernoulli_distribution d(probability);
-                        if (d(gen)) {
-                            S.push_back(vertex);
-                            S_bitmap[vertex] = true;
-                            items_selected_here++;
+                // Get the slice of V that this thread will work on
+                auto partial_V = V_splitter->get(thread_idx);
+                if (!partial_V.empty()) {
+                    auto &S = partial_S[thread_idx];
+                    // Select at least one item from V
+                    while (S.empty()) {
+                        // Include each vertex with probability 1/(2/d(v))
+                        for (uint32_t vertex : partial_V) {
+                            double probability = 1. / (2 * graph.degree_of(vertex));
+                            std::bernoulli_distribution d(probability);
+                            if (d(gen)) {
+                                S.push_back(vertex);
+                                S_bitmap[vertex] = true;
+                            }
                         }
                     }
                 }
@@ -41,6 +43,7 @@ void LubySolver::solve(Graph &original_graph) {
             }
         }, i, std::cref(original_graph));
 
+    // Basic structure of MIS-based algorithms: create a MIS, then color it with a new color, and remove it from the graph
     color_t color = 0;
     while (!uncolored_graph.empty()) {
         compute_MIS(uncolored_graph);
@@ -91,17 +94,22 @@ void LubySolver::compute_MIS(const DeletableGraph &del_graph) {
 }
 
 void LubySolver::probabilistic_select(const Graph &graph) {
-    V_vec = std::move(std::vector<uint32_t>(V.cbegin(), V.cend()));
+    // Reset solver state
     S.clear();
     S_bitmap.clear();
     S_bitmap.resize(graph.vertices.size());
     for (auto &S_ : partial_S)
         S_.clear();
-    items_per_thread = ceil(float(V.size())/float(num_threads));
+    // Mirror V into a temporary vector
+    V_vec = std::move(std::vector<uint32_t>(V.cbegin(), V.cend()));
+    delete V_splitter;
+    V_splitter = new VectorSplitter(V_vec, num_threads);
 
+    // Start all threads...
     pthread_barrier_wait(&thread_start_barrier);
+    // And wait for them to terminate
     pthread_barrier_wait(&thread_end_barrier);
-    // Concatenate the partial S
+    // Concatenate the partial S that each thread computed
     for (const auto &partial : partial_S)
         S.insert(S.end(), partial.cbegin(), partial.cend());
 }
@@ -111,17 +119,16 @@ void LubySolver::remove_edges(const Graph &g) {
     if (S.size() < 2)
         return;
 
-    // For each edge in E, check that "from" and "to" are in the graph.
+    // Specification: "For each edge in E, check if 'from' and 'to' are in the graph S.".
+    // We can loop on fewer items by checking "for each edge in S, check if 'from' and 'to' are in E."
 
-    // First, check that the "from" index is in S.
     for (uint32_t from : S) {
-        // Then, check that the "to" index is also in S.
-        /*
-        // Equivalent to:
-        for (uint32_t to : g.neighbors_of(from)) {
-            if (to < from)
-                continue;
-        */
+        /* Equivalent to:
+         *
+         *   for (uint32_t to : g.neighbors_of(from))
+         *
+         * However, since neighbors are sorted we can start searching in the middle of the array, after the smaller vertices.
+         */
         auto &neighbors = g.neighbors_of(from);
         for (auto pos = std::lower_bound(neighbors.cbegin(), neighbors.cend(), from); pos != neighbors.cend(); ++pos) {
             uint32_t to = *pos;

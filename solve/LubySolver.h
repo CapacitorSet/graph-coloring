@@ -5,6 +5,7 @@
 #include <set>
 #include <thread>
 #include "Solver.h"
+#include "../utils/RangeSplitter.h"
 
 class LubySolver : public Solver {
     int num_threads;
@@ -17,12 +18,12 @@ class LubySolver : public Solver {
     std::vector<char> S_bitmap;
     std::vector<std::vector<uint32_t>> partial_S;
     std::set<uint32_t> V;
-    // Mirrors V into a vector so that each thread can work on part of it
+    // Mirrors V into a vector so that each thread can work on part of it using V_splitter
     std::vector<uint32_t> V_vec;
+    VectorSplitter<uint32_t> *V_splitter;
 
     bool kill_threads;
     pthread_barrier_t thread_start_barrier, thread_end_barrier;
-    int items_per_thread;
 
     // First step
     inline void probabilistic_select(const Graph &);
@@ -33,6 +34,7 @@ class LubySolver : public Solver {
 
 public:
     LubySolver(int num_threads = 1);
+    ~LubySolver();
 
     std::string name() const;
 
