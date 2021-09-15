@@ -1,0 +1,81 @@
+Graph;Vertices;Edges;Solver;Time elapsed;Memory usage;Success;Colors
+rgg_n_2_15_s0.graph.fast;32768;342581;SequentialSolver;20.18;8.26;1;15
+rgg_n_2_15_s0.graph.fast;32768;342581;LubySolver (1 threads);195.71;11.85;1;14
+rgg_n_2_15_s0.graph.fast;32768;342581;LubySolver (2 threads);153.96;8.13;1;14
+rgg_n_2_15_s0.graph.fast;32768;342581;LubySolver (4 threads);152.61;16.26;1;14
+rgg_n_2_15_s0.graph.fast;32768;342581;JonesSolver (1 threads);19.93;0.16;1;15
+rgg_n_2_15_s0.graph.fast;32768;342581;JonesSolver (2 threads);15.71;0.25;1;15
+rgg_n_2_15_s0.graph.fast;32768;342581;JonesSolver (4 threads);16.56;8.25;1;15
+rgg_n_2_15_s0.graph.fast;32768;342581;LDFsolver (1 threads);21.57;0.00;1;14
+rgg_n_2_16_s0.graph.fast;65536;706107;SequentialSolver;43.41;8.38;1;17
+rgg_n_2_16_s0.graph.fast;65536;706107;LubySolver (1 threads);389.91;13.69;1;17
+rgg_n_2_16_s0.graph.fast;65536;706107;LubySolver (2 threads);392.72;8.13;1;16
+rgg_n_2_16_s0.graph.fast;65536;706107;LubySolver (4 threads);465.19;16.26;1;16
+rgg_n_2_16_s0.graph.fast;65536;706107;JonesSolver (1 threads);45.13;0.00;1;17
+rgg_n_2_16_s0.graph.fast;65536;706107;JonesSolver (2 threads);43.31;0.00;1;17
+rgg_n_2_16_s0.graph.fast;65536;706107;JonesSolver (4 threads);35.43;8.00;1;17
+rgg_n_2_16_s0.graph.fast;65536;706107;LDFsolver (1 threads);45.70;0.00;1;15
+rgg_n_2_17_s0.graph.fast;131072;1479565;SequentialSolver;99.42;8.63;1;16
+rgg_n_2_17_s0.graph.fast;131072;1479565;LubySolver (1 threads);938.89;17.07;1;17
+rgg_n_2_17_s0.graph.fast;131072;1479565;LubySolver (2 threads);802.53;8.32;1;16
+rgg_n_2_17_s0.graph.fast;131072;1479565;LubySolver (4 threads);831.59;16.26;1;17
+rgg_n_2_17_s0.graph.fast;131072;1479565;JonesSolver (1 threads);97.11;0.00;1;16
+rgg_n_2_17_s0.graph.fast;131072;1479565;JonesSolver (2 threads);72.90;0.00;1;16
+rgg_n_2_17_s0.graph.fast;131072;1479565;JonesSolver (4 threads);67.89;8.00;1;16
+rgg_n_2_17_s0.graph.fast;131072;1479565;LDFsolver (1 threads);97.34;0.00;1;16
+rgg_n_2_18_s0.graph.fast;262144;3116649;SequentialSolver;257.48;9.13;1;18
+rgg_n_2_18_s0.graph.fast;262144;3116649;LubySolver (1 threads);2150.05;24.21;1;18
+rgg_n_2_18_s0.graph.fast;262144;3116649;LubySolver (2 threads);1810.91;8.38;1;18
+rgg_n_2_18_s0.graph.fast;262144;3116649;LubySolver (4 threads);1799.37;16.26;1;19
+rgg_n_2_18_s0.graph.fast;262144;3116649;JonesSolver (1 threads);223.54;0.00;1;19
+rgg_n_2_18_s0.graph.fast;262144;3116649;JonesSolver (2 threads);200.35;0.00;1;19
+rgg_n_2_18_s0.graph.fast;262144;3116649;JonesSolver (4 threads);155.67;8.00;1;19
+rgg_n_2_18_s0.graph.fast;262144;3116649;LDFsolver (1 threads);219.65;0.00;1;17
+rgg_n_2_19_s0.graph.fast;524288;6561438;SequentialSolver;616.47;10.13;1;19
+rgg_n_2_19_s0.graph.fast;524288;6561438;LubySolver (1 threads);4903.86;40.52;1;19
+rgg_n_2_19_s0.graph.fast;524288;6561438;LubySolver (2 threads);4306.44;8.13;1;20
+rgg_n_2_19_s0.graph.fast;524288;6561438;LubySolver (4 threads);4015.64;16.26;1;19
+rgg_n_2_19_s0.graph.fast;524288;6561438;JonesSolver (1 threads);457.32;0.00;1;19
+rgg_n_2_19_s0.graph.fast;524288;6561438;JonesSolver (2 threads);319.33;0.00;1;19
+rgg_n_2_19_s0.graph.fast;524288;6561438;JonesSolver (4 threads);288.52;8.00;1;19
+rgg_n_2_19_s0.graph.fast;524288;6561438;LDFsolver (1 threads);523.41;0.00;1;19
+rgg_n_2_20_s0.graph.fast;1048576;13805153;SequentialSolver;1545.36;12.12;1;22
+rgg_n_2_20_s0.graph.fast;1048576;13805153;LubySolver (1 threads);10977.43;69.59;1;20
+rgg_n_2_20_s0.graph.fast;1048576;13805153;LubySolver (2 threads);9632.01;10.21;1;21
+rgg_n_2_20_s0.graph.fast;1048576;13805153;LubySolver (4 threads);9035.06;22.44;1;20
+rgg_n_2_20_s0.graph.fast;1048576;13805153;JonesSolver (1 threads);949.97;0.00;1;20
+rgg_n_2_20_s0.graph.fast;1048576;13805153;JonesSolver (2 threads);862.58;0.00;1;20
+rgg_n_2_20_s0.graph.fast;1048576;13805153;JonesSolver (4 threads);593.01;8.00;1;20
+rgg_n_2_20_s0.graph.fast;1048576;13805153;LDFsolver (1 threads);1046.44;0.00;1;19
+rgg_n_2_21_s0.graph.fast;2097152;28998070;SequentialSolver;3751.82;16.13;1;20
+rgg_n_2_21_s0.graph.fast;2097152;28998070;LubySolver (1 threads);24184.88;137.09;1;21
+rgg_n_2_21_s0.graph.fast;2097152;28998070;LubySolver (2 threads);20992.74;26.85;1;20
+rgg_n_2_21_s0.graph.fast;2097152;28998070;LubySolver (4 threads);20515.67;31.91;1;21
+rgg_n_2_21_s0.graph.fast;2097152;28998070;JonesSolver (1 threads);2301.37;0.00;1;22
+rgg_n_2_21_s0.graph.fast;2097152;28998070;JonesSolver (2 threads);1426.55;0.00;1;22
+rgg_n_2_21_s0.graph.fast;2097152;28998070;JonesSolver (4 threads);1280.52;8.00;1;22
+rgg_n_2_21_s0.graph.fast;2097152;28998070;LDFsolver (1 threads);2556.53;0.00;1;20
+rgg_n_2_22_s0.graph.fast;4194304;60740390;SequentialSolver;8367.05;24.13;1;23
+rgg_n_2_22_s0.graph.fast;4194304;60740390;LubySolver (1 threads);53147.80;271.25;1;21
+rgg_n_2_22_s0.graph.fast;4194304;60740390;LubySolver (2 threads);45789.88;47.71;1;23
+rgg_n_2_22_s0.graph.fast;4194304;60740390;LubySolver (4 threads);43427.29;53.21;1;21
+rgg_n_2_22_s0.graph.fast;4194304;60740390;JonesSolver (1 threads);4489.54;0.00;1;22
+rgg_n_2_22_s0.graph.fast;4194304;60740390;JonesSolver (2 threads);3110.72;0.00;1;22
+rgg_n_2_22_s0.graph.fast;4194304;60740390;JonesSolver (4 threads);2621.24;8.00;1;22
+rgg_n_2_22_s0.graph.fast;4194304;60740390;LDFsolver (1 threads);4736.44;0.00;1;21
+rgg_n_2_23_s0.graph.fast;8388608;127024800;SequentialSolver;16992.01;40.13;1;23
+rgg_n_2_23_s0.graph.fast;8388608;127024800;LubySolver (1 threads);113622.21;476.88;1;25
+rgg_n_2_23_s0.graph.fast;8388608;127024800;LubySolver (2 threads);98423.66;87.70;1;22
+rgg_n_2_23_s0.graph.fast;8388608;127024800;LubySolver (4 threads);92942.30;109.05;1;24
+rgg_n_2_23_s0.graph.fast;8388608;127024800;JonesSolver (1 threads);9783.84;0.00;1;23
+rgg_n_2_23_s0.graph.fast;8388608;127024800;JonesSolver (2 threads);6270.94;0.00;1;23
+rgg_n_2_23_s0.graph.fast;8388608;127024800;JonesSolver (4 threads);5336.81;8.00;1;23
+rgg_n_2_23_s0.graph.fast;8388608;127024800;LDFsolver (1 threads);10304.91;0.00;1;23
+rgg_n_2_24_s0.graph.fast;16777216;265136410;SequentialSolver;37403.21;72.13;1;24
+rgg_n_2_24_s0.graph.fast;16777216;265136410;LubySolver (1 threads);246275.05;907.16;1;24
+rgg_n_2_24_s0.graph.fast;16777216;265136410;LubySolver (2 threads);216475.54;162.50;1;26
+rgg_n_2_24_s0.graph.fast;16777216;265136410;LubySolver (4 threads);205987.19;202.47;1;25
+rgg_n_2_24_s0.graph.fast;16777216;265136410;JonesSolver (1 threads);20851.95;0.00;1;24
+rgg_n_2_24_s0.graph.fast;16777216;265136410;JonesSolver (2 threads);13235.62;0.00;1;24
+rgg_n_2_24_s0.graph.fast;16777216;265136410;JonesSolver (4 threads);11562.42;8.00;1;24
+rgg_n_2_24_s0.graph.fast;16777216;265136410;LDFsolver (1 threads);21298.10;0.00;1;22

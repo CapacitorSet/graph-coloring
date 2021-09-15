@@ -98,3 +98,11 @@ The memory usage is monitored by spawning a `MemoryMonitor` thread that will rea
  - `stop()` is used to signal that there are no more items to be produced. This lets workers exit when the queue is empty.
 
 ## Results
+
+We analyzed the solvers with respect to time elapsed in a Jupyter notebook in `data-analysis/`. We report our conclusion, and redirect the reader to the notebook for further detail:
+
+>The choice of algorithm results in vastly different performances. Early multithread algorithms found in literature may perform significantly worse than simpler single-thread ones, and thus be only of theoretical interest; more recent ones typically provide a measurable speedup.
+
+>At the same time, one must not forget that efficient algorithms and techniques can provide a speedup simply at the expense of additional complexity or memory usage. The case of FastParser provides a strong argument for efficient algorithms; the case of JonesSolver shows that at times multithreading can beat even the sequential solver with the best heuristics.
+
+>Ultimately, the question of whether to parallelize an algorithm or to implement a new one is hard to answer a priori, and the decision must be driven by profiling and experimentation.
