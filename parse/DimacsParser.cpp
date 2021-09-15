@@ -5,6 +5,7 @@
 #include "../utils/PCVector.h"
 #include "Parser.h"
 #include "DimacsParser.h"
+#include "../utils/RangeSplitter.h"
 
 DimacsParser::DimacsParser(std::ifstream &_file, const std::string &filename)
         : file(std::move(_file)), fastparse_file(filename + ".fast"), num_threads(2) {
@@ -79,13 +80,13 @@ std::vector<edges_t> DimacsParser::merge_adj_lists(const std::vector<edges_t> &v
     // Because DIMACS-10 only includes edges once (eg. 1->2 and not 2->1), we must merge the adjacency lists.
     // To do so in parallel, each thread can only write to a range of 1/N elements.
     // Each thread will iterate over all vertices and merge any relevant nodes.
-    int items_per_thread = std::ceil(float(num_vertices)/float(num_threads));
+    RangeSplitter rs(num_vertices, num_threads);
     std::vector<std::thread> threads;
     for (int thread_idx = 0; thread_idx < num_threads; thread_idx++)
-        threads.emplace_back([&, thread_idx, items_per_thread]() {
+        threads.emplace_back([&, thread_idx, rs]() {
             // Range of lines that this thread is allowed to write: [range_lower, range_higher)
-            int range_lower = items_per_thread * thread_idx;
-            int range_higher = items_per_thread * (thread_idx + 1);
+            int range_lower = rs.get_min(thread_idx),
+                range_higher = rs.get_max(thread_idx);
 
             // If the edge 1->2 appears, we must create 2->1: vertices[destination].push_back(source).
             for (int source_id = 0; source_id < vertices.size(); source_id++) {
