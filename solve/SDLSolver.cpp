@@ -1,10 +1,8 @@
-#include "SDLparallelSolver.h"
+#include "SDLSolver.h"
 
-#include <stdio.h>
+SDLSolver::SDLSolver(int num_threads) : num_threads(num_threads) {}
 
-SDLparallelSolver::SDLparallelSolver(int num_threads) : num_threads(num_threads) {}
-
-void SDLparallelSolver::solve(Graph &graph) {
+void SDLSolver::solve(Graph &graph) {
     
     uint32_t num_vertices = graph.vertices.size();
 
@@ -17,51 +15,45 @@ void SDLparallelSolver::solve(Graph &graph) {
     uint32_t remaining_vertices = num_vertices % num_threads;
 
     /* if a number of threads larger than the ability of the system, generate error */
-    if (num_threads > std::thread::hardware_concurrency()) {
-        std::cout << "The largest number of threads can be used is: " << std::thread::hardware_concurrency() << std::endl;
-        perror("Very large number of threads!! Please, use a smaller number !\n");
-        return;
-    }
+    if (num_threads > std::thread::hardware_concurrency())
+        throw std::runtime_error("Hardware concurrency exceeded: please use at most " +
+                                 std::to_string(std::thread::hardware_concurrency()) + " threads");
 
-    /* if a number of threads greater than the number of vertices, generate error */
-    else if (num_threads > num_vertices) {
-        perror("The entered number of threads is larger than number of vertices!! Please, use a number that is less than or equal the number of vertices\n");
-        return;
-    }
+    // todo: fix
+    if (num_threads > num_vertices)
+        throw std::runtime_error("More threads than vertices: please use at most " +
+                                 std::to_string(num_vertices) + " threads");
 
-    else {
+    /* Each thread has a vertex to start from and a range of vertices to work on */
+    uint32_t vertex = 0;
+    uint32_t range = vertices_per_thread;
+    uint32_t thread_counter = num_threads;
 
-        /* Each thread has a vertex to start from and a range of vertices to work on */
-        uint32_t vertex = 0;
-        uint32_t range = vertices_per_thread;
-        uint32_t thread_counter = num_threads;
+    std::vector<std::thread> thread_Pool;
 
-        std::vector<std::thread> thread_Pool;
-
-        while (thread_counter) {
-            if (thread_counter == 1) {
-                range = vertices_per_thread + remaining_vertices;
-            }
-
-            thread_Pool.emplace_back(std::thread([vertex, &range, &graph, &weights, &degrees, this]() {
-                
-                /* Applying the weighting phase where each vertex takes a weight according to a particular algorithm */
-                apply_weighting_phase(graph, degrees, weights, vertex, (range + vertex));
-
-                /* Applying the coloring phase where coloring is done in order according to the assigned weights */
-                apply_coloring_phase(degrees, vertex, range, graph);
-            }));
-            vertex += vertices_per_thread;
-            thread_counter--;
+    while (thread_counter) {
+        if (thread_counter == 1) {
+            range = vertices_per_thread + remaining_vertices;
         }
 
-        for (auto &th : thread_Pool) {
-            th.join();
-        }
+        thread_Pool.emplace_back(std::thread([vertex, &range, &graph, &weights, &degrees, this]() {
+
+            /* Applying the weighting phase where each vertex takes a weight according to a particular algorithm */
+            apply_weighting_phase(graph, degrees, weights, vertex, (range + vertex));
+
+            /* Applying the coloring phase where coloring is done in order according to the assigned weights */
+            apply_coloring_phase(degrees, vertex, range, graph);
+        }));
+        vertex += vertices_per_thread;
+        thread_counter--;
+    }
+
+    for (auto &th : thread_Pool) {
+        th.join();
     }
 }
 
-void SDLparallelSolver::apply_weighting_phase(Graph &original_graph, std::vector<uint32_t> &degrees, std::vector<uint32_t> &weights, const uint32_t vertex, const uint32_t &upper_bound) {
+void SDLSolver::apply_weighting_phase(Graph &original_graph, std::vector<uint32_t> &degrees, std::vector<uint32_t> &weights, const uint32_t vertex, const uint32_t &upper_bound) {
 
     /*Each vertex computes its degree and announcing it by saving it in a shared vector */
     for (uint32_t vertexID = vertex; vertexID < upper_bound; vertexID++) {
@@ -100,7 +92,7 @@ void SDLparallelSolver::apply_weighting_phase(Graph &original_graph, std::vector
     }
 }
 
-void SDLparallelSolver::apply_coloring_phase(std::vector<uint32_t> &weights, uint32_t vertex, const uint32_t range, Graph &original_graph) {
+void SDLSolver::apply_coloring_phase(std::vector<uint32_t> &weights, uint32_t vertex, const uint32_t range, Graph &original_graph) {
 
     /* Create a vector to represent the vertices to be colored in order and intialize it in ascending order */
     std::vector<uint32_t> vertices_to_color(range);
@@ -117,6 +109,6 @@ void SDLparallelSolver::apply_coloring_phase(std::vector<uint32_t> &weights, uin
     }
 }
 
-std::string SDLparallelSolver::name() const {
-    return "SDLparallelSolver (" + std::to_string(num_threads) + " threads)";
+std::string SDLSolver::name() const {
+    return "SDLSolver (" + std::to_string(num_threads) + " threads)";
 }

@@ -1,10 +1,10 @@
-#include "LDFparallelSolver.h"
+#include "LDFSolver.h"
 #include <numeric>
 #include <thread>
 
-LDFparallelSolver::LDFparallelSolver(int num_threads) : num_threads(num_threads) {}
+LDFSolver::LDFSolver(int num_threads) : num_threads(num_threads) {}
 
-void LDFparallelSolver::solve(Graph &graph) {
+void LDFSolver::solve(Graph &graph) {
     
     uint32_t num_vertices = graph.vertices.size();
 
@@ -49,7 +49,7 @@ void LDFparallelSolver::solve(Graph &graph) {
     }
 }
 
-void LDFparallelSolver::coloring_in_parallel(std::vector<uint32_t> &degrees, uint32_t vertex, uint32_t range, Graph &original_graph) {
+void LDFSolver::coloring_in_parallel(std::vector<uint32_t> &degrees, uint32_t vertex, uint32_t range, Graph &original_graph) {
 
     /* Create a vector to represent the vertices to be colored in order and intialize it in ascending order */
     std::vector<uint32_t> vertices_to_color(range);
@@ -66,6 +66,6 @@ void LDFparallelSolver::coloring_in_parallel(std::vector<uint32_t> &degrees, uin
     }
 }
 
-std::string LDFparallelSolver::name() const {
-    return "LDFparallelSolver (" + std::to_string(num_threads) + " threads)";
+std::string LDFSolver::name() const {
+    return "LDFSolver (" + std::to_string(num_threads) + " threads)";
 }
