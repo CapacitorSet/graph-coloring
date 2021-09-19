@@ -12,8 +12,7 @@ void SDLSolver::solve(Graph &graph) {
 
     /* if a number of threads larger than the ability of the system, generate error */
     if (num_threads > std::thread::hardware_concurrency())
-        throw std::runtime_error("Hardware concurrency exceeded: please use at most " +
-                                 std::to_string(std::thread::hardware_concurrency()) + " threads");
+        throw std::runtime_error("Hardware concurrency exceeded: please use at most " + std::to_string(std::thread::hardware_concurrency()) + " threads");
 
     /* Each thread has a vertex to start from and a range of vertices to work on */
     RangeSplitter rs(num_vertices, num_threads);
@@ -34,6 +33,12 @@ void SDLSolver::solve(Graph &graph) {
 
     for (auto &th : threads) {
         th.join();
+    }
+
+    if(!wrong_ones.empty()) {
+        for(const auto &vertex : wrong_ones) {
+            graph.color_with_smallest(vertex);
+        }
     }
 }
 
@@ -82,8 +87,14 @@ void SDLSolver::apply_coloring_phase(const std::vector<uint32_t> &weights, uint3
     });
 
     /* start coloring according to the order assigned above where no two neighbors have the same color */
-    for (uint32_t vertex_to_color : vertices_to_color) {
-        graph.color_with_smallest(vertex_to_color);
+    for (const auto &vertex_to_color : vertices_to_color) {
+        if(uint32_t my_color = graph.color_with_smallest(vertex_to_color)){
+            for (const auto &neighbor : graph.vertices[vertex_to_color]) {
+                if(my_color == graph.colors[neighbor]) {
+                    wrong_ones.emplace_back(vertex_to_color);
+                }
+            }
+        }
     }
 }
 

@@ -26,6 +26,12 @@ void LDFSolver::solve(Graph &graph) {
     for (auto &th : threads) {
         th.join();
     }
+
+    if(!wrong_ones.empty()) {
+        for(const auto &vertex : wrong_ones) {
+            graph.color_with_smallest(vertex);
+        }
+    }
 }
 
 void LDFSolver::coloring_in_parallel(uint32_t from, uint32_t to, Graph &graph) {
@@ -39,8 +45,14 @@ void LDFSolver::coloring_in_parallel(uint32_t from, uint32_t to, Graph &graph) {
     });
 
     /* start coloring according to the order assigned above where no two neighbors have the same color */
-    for (uint32_t vertex_to_color : vertices_to_color) {
-        graph.color_with_smallest(vertex_to_color);
+    for (const auto &vertex_to_color : vertices_to_color) {
+        if(uint32_t my_color = graph.color_with_smallest(vertex_to_color)){
+            for (const auto &neighbor : graph.vertices[vertex_to_color]) {
+                if(my_color == graph.colors[neighbor]) {
+                    wrong_ones.emplace_back(vertex_to_color);
+                }
+            }
+        }
     }
 }
 
