@@ -7,6 +7,7 @@
 #include "../solve/JonesSolver.h"
 #include "../solve/LDFSolver.h"
 #include "../solve/SDLSolver.h"
+#include "../solve/RandomSelectionSolver.h"
 
 Benchmark::Benchmark(Graph &g) : solvers({
     new SequentialSolver(),
@@ -22,6 +23,9 @@ Benchmark::Benchmark(Graph &g) : solvers({
     new LDFSolver(1),
     new LDFSolver(2),
     new LDFSolver(4),
+    new RandomSelectionSolver(1),
+    new RandomSelectionSolver(2),
+    new RandomSelectionSolver(4),
 }), graph(g) {}
 
 void Benchmark::run() {

@@ -21,6 +21,7 @@ class Graph {
     friend class JonesSolver;
     friend class LDFSolver;
     friend class SDLSolver;
+    friend class RandomSelectionSolver;
 
 public:
     Graph(std::vector<edges_t> &&_vertices);
