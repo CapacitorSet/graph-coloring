@@ -21,6 +21,7 @@ class Graph {
     friend class JonesSolver;
     friend class LDFSolver;
     friend class SDLSolver;
+    friend class FVFSolver;
     friend class RandomSelectionSolver;
 
 public:

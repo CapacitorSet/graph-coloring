@@ -7,22 +7,32 @@
 #include "../solve/JonesSolver.h"
 #include "../solve/LDFSolver.h"
 #include "../solve/SDLSolver.h"
+#include "../solve/FVFSolver.h"
 #include "../solve/RandomSelectionSolver.h"
 
 Benchmark::Benchmark(Graph &g) : solvers({
     new SequentialSolver(),
+
     new LubySolver(1),
     new LubySolver(2),
     new LubySolver(4),
+
     new JonesSolver(1),
     new JonesSolver(2),
     new JonesSolver(4),
+
     new SDLSolver(1),
     new SDLSolver(2),
     new SDLSolver(4),
+
     new LDFSolver(1),
     new LDFSolver(2),
     new LDFSolver(4),
+
+    new FVFSolver(1),
+    new FVFSolver(2),
+    new FVFSolver(4),
+
     new RandomSelectionSolver(1),
     new RandomSelectionSolver(2),
     new RandomSelectionSolver(4),

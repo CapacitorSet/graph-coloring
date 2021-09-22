@@ -28,7 +28,9 @@ void SDLSolver::solve(Graph &graph) {
 
             /* Applying the coloring phase where coloring is done in order according to the assigned weights */
             apply_coloring_phase(degrees, from, to, graph);
+
         }));
+
     }
 
     for (auto &th : threads) {
@@ -55,35 +57,37 @@ void SDLSolver::apply_weighting_phase(const Graph &graph, std::vector<uint32_t> 
         max_degree = std::max(max_degree, degrees[vertexID]);
 
     /* The weight and the degree the threads are dealing with. They are initialized to zero at the beginning */
-    uint32_t CurrentWeight = 0;
+    uint32_t CurrentWeight = 1;
     uint32_t CurrentDegree = 0;
 
     /* Keep working till the globalDegree reached the max degree */
     while (CurrentDegree <= max_degree) {
         for (uint32_t vertexID = from; vertexID < to; vertexID++)  {
-            if (degrees[vertexID] <= CurrentDegree && degrees[vertexID] > 0) {
+            if (degrees[vertexID] <= CurrentDegree && degrees[vertexID] >= 0) {
                 weights[vertexID] = CurrentWeight;
-                degrees[vertexID] = 0;
+                degrees[vertexID] = -1;
                 for (uint32_t neighbor : graph.neighbors_of(vertexID)) {
-                    if (degrees[neighbor] != CurrentDegree) {
+                    if (degrees[neighbor] > 0) {
                         degrees[neighbor]--;
                     }
                 }
             }
         }
+
         CurrentWeight++;
         CurrentDegree++;
     }
 }
 
 void SDLSolver::apply_coloring_phase(const std::vector<uint32_t> &weights, uint32_t from, uint32_t to, Graph &graph) {
+
     /* Create a vector to represent the vertices to be colored in order and initialize it in ascending order */
     std::vector<uint32_t> vertices_to_color(to - from);
     std::iota(vertices_to_color.begin(), vertices_to_color.end(), from);
 
     /* Sort the vector by weight */
     std::stable_sort(vertices_to_color.begin(), vertices_to_color.end(), [&](int i, int j) {
-        return weights[i + from] > weights[j + from];
+        return weights[i] > weights[j];
     });
 
     /* start coloring according to the order assigned above where no two neighbors have the same color */

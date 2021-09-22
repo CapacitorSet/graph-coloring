@@ -16,6 +16,7 @@ add_executable(graph_coloring
         solve/JonesSolver.cpp solve/JonesSolver.h
         solve/SDLSolver.cpp solve/SDLSolver.h
         solve/LDFSolver.cpp solve/LDFSolver.h
+        solve/FVFSolver.cpp solve/FVFSolver.h
         solve/RandomSelectionSolver.cpp solve/RandomSelectionSolver.h
         benchmark/Benchmark.cpp benchmark/Benchmark.h
         benchmark/MemoryMonitor.cpp benchmark/MemoryMonitor.h
