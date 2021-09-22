@@ -1,6 +1,21 @@
-# Parallel graph coloring
+# Parallel Graph Coloring
 
 This project investigates the implementation of several parallel algorithms for graph coloring and compares them to a well-known sequential algorithm in terms of time and memory.
+
+## Introduction to graph coloring
+In discrete mathematics, a graph is a structure consists of nodes called “Vertices” and links between these nodes called “Edges”. There are two main types of a graph, which are undirected graph and directed graphs, where an edge between 2 vertices has a direction. However, in our scope we focus only on undirected graphs.
+
+Graph components such as vertex or edge can have a label and the process of assigning label to an edge or vertex is called “Graph Labeling” and a label is traditionally represented by an integer. In our project, we focus on vertex labeling only and the labels we are assigning are colors, then the process is called “Vertices Coloring” or generally “Graph Coloring”.
+
+Graph Coloring is a well-known problem in the discrete mathematics field and its practical applications. It is a way to color the vertices of a graph in such a way that there are no two adjacent vertices have the same color. Therefore, there are many algorithms have been developed to solve this problem. Our Goal is to find the most appropriate on for a parallel environment.
+
+In order to solve the problem of graph coloring in an efficient way, the parallel coloring is used by most of algorithms, which manipulate the multi-core ability of modern processors and multi-thread programming capabilities provided by operating systems to achieve higher performance.
+The key measures of the performance of an algorithm are:
+-	Time consumption (Speed).
+-	Memory consumption.
+-	Colors consumption.
+
+Therefore, an efficient algorithm with high performance should achieve low time consumption (high speed), low memory consumption, and low colors consumption, which means the algorithm should use the least number of colors to color the whole graph.
 
 ## Overview
 
@@ -82,13 +97,24 @@ Because this algorithm suffers from frequent looping, we added a small optimizat
 
 Although Jones' paper describes the algorithm in terms of message sending between different processors - one per vertex - we adopt a cleaner implementation. Notably, `rho` is generated once by a single thread, and message-passing is replaced by keeping a queue of "free vertices" that can be colored. Parallelizing this is trivial: we can have as many threads as we want acting as consumers on the free vertices queue. Because multiple threads may update the `num_wait` for a vertex (the number of uncolored neighbors with a lower rho), it must use an atomic int; no further synchronization is required.
 
-#### LDF
+#### Largest Degree First (LDF)
 
-*To do*
+`LDFsolver` implements the algorithm from *A Comparison of Parallel Graph Coloring Algorithms*, J. R. Allwright, 1995. As it is clear from it is name, the algorithm uses the degree of vertices in the subsets of the graph to decide which vertex to be colored before the other(Largest degree is colored firstly). This is a totlly different criterion from the independent set and random weights used in Jones and Lubys algorithms. In case of there are more than one vertex has the same degree, the priority of coloring is random in this case. The approach in LDF is to use the least number of colors. 
 
-#### Random priority
+#### Smallest Degree Last (SDL)
 
-*To do*
+`SDL` implements the algorithm from *A Comparison of Parallel Graph Coloring Algorithms*, J. R. Allwright, 1995.This algorithm uses degrees also like LDF. However, unlike LDF it uses also weights to decide which vertex to be colored first. The algorithm goes into two phases. The first phase is the weighting phase, in which, all vertices in the subset have a degree equal to the smallest degree takes a weight equal the current weight, and this vertex is removed from our calculation for the comming vertices which decrease the degree of its neighbor. This processed is repeated many times until we have groups of vertices each one have a unique weight. Then, the second phase comes to color this groups starting from the largest weight to the smallest weight.
+
+### Other Two Solvers
+These two algorithms never mentioned before in any scientific paper. However we have invented and implemented them for the comparing and analysis purposes.
+
+#### First Vertex First (FVF)
+ This algorithm adopts the order of the vertices data is saved like in the graph file. As its name, it colors the first vertex in the graph file in the subset of a thread. This approach makes the algorithm easier and simpler. This is because calculating degrees and weights and following a new order are operations that consume effort and time, so they are ignored in this algorithm to achieve the least possible time. However, this improvment in the performance may come with a trade off. There is no criterion theoritically planned to acheive the least number of colors. However, empirically, it may show different results.
+
+#### Random Selection
+ As its name, unlike LDF and SDL, it has no criterion to select a vertex to be color before other. The selection criterion is totally random. We shuffle the order of the vertices in the subset of a thread, then we start coloring in this random order. The approach is to save the effort consumed to follow a criterion. However, this improvment in the performance may come with a trade off. There is no criterion theoritically planned to acheive the least number of colors. However, empirically, it may show different results.
+
+
 
 ### Benchmarking
 
