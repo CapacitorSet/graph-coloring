@@ -29,10 +29,8 @@ void RandomSelectionSolver::solve(Graph &graph) {
         th.join();
     }
 
-    if(!wrong_ones.empty()) {
-        for(const auto &vertex : wrong_ones) {
-            graph.color_with_smallest(vertex);
-        }
+    for (const auto &vertex : wrong_ones) {
+        graph.color_with_smallest(vertex);
     }
 }
 
@@ -46,12 +44,12 @@ void RandomSelectionSolver::coloring_in_parallel(uint32_t from, uint32_t to, Gra
     std::shuffle(random_order.begin(), random_order.end(), random_gen);
 
     /* start coloring according to the order assigned above where no two neighbors have the same color */
-    for (uint32_t vertex_to_color : random_order) {
-        if(uint32_t my_color = graph.color_with_smallest(vertex_to_color)){
-            for (const auto &neighbor : graph.neighbors_of(vertex_to_color)) {
-                if(my_color == graph.color_of(neighbor)) {
-                    wrong_ones.emplace_back(vertex_to_color);
-                }
+    for (const auto &vertex_to_color : random_order) {
+        uint32_t my_color = graph.color_with_smallest(vertex_to_color);
+        for (const auto &neighbor : graph.vertices[vertex_to_color]) {
+            if (my_color == graph.colors[neighbor]) {
+                wrong_ones.emplace_back(vertex_to_color);
+                break;
             }
         }
     }
