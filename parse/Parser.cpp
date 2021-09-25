@@ -1,10 +1,10 @@
+#include "Parser.h"
+#include "Dimacs10Parser.h"
+#include "DimacsParser.h"
+#include "FastParser.h"
+#include "Serializer.h"
 #include <chrono>
 #include <filesystem>
-#include "Parser.h"
-#include "FastParser.h"
-#include "DimacsParser.h"
-#include "Dimacs10Parser.h"
-#include "Serializer.h"
 
 Parser::Parser(const std::string &_path) {
     std::ifstream file(_path);

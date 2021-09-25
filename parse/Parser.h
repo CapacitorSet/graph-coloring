@@ -5,7 +5,7 @@
 
 // Parser interface
 class IParser {
-public:
+  public:
     virtual ~IParser() = default;
     virtual Graph parse() = 0;
 };
@@ -15,7 +15,7 @@ class Parser {
     bool serializable;
     std::string fast_filename;
 
-public:
+  public:
     using metadata_t = struct {
         std::string filename;
         int num_vertices, num_edges;
@@ -30,6 +30,5 @@ public:
 
     Graph parse();
 };
-
 
 #endif //GRAPH_COLORING_PARSER_H

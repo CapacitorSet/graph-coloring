@@ -1,11 +1,11 @@
 #ifndef GRAPH_COLORING_LUBYSOLVER_H
 #define GRAPH_COLORING_LUBYSOLVER_H
 
+#include "../utils/RangeSplitter.h"
+#include "Solver.h"
 #include <random>
 #include <set>
 #include <thread>
-#include "Solver.h"
-#include "../utils/RangeSplitter.h"
 
 class LubySolver : public Solver {
     int num_threads;
@@ -32,14 +32,13 @@ class LubySolver : public Solver {
     // Luby's algorithm
     void compute_MIS(const DeletableGraph &src);
 
-public:
+  public:
     LubySolver(int num_threads = 1);
     ~LubySolver();
 
     std::string name() const;
 
-    void solve(Graph&);
+    void solve(Graph &);
 };
-
 
 #endif //GRAPH_COLORING_LUBYSOLVER_H

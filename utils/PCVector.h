@@ -4,16 +4,16 @@
 #include <functional>
 #include <mutex>
 #include <optional>
-#include <vector>
 #include <semaphore.h>
+#include <vector>
 
 // A vector that implements the producer-consumer pattern.
-template<typename T>
+template <typename T>
 class PCVector {
-public:
+  public:
     using callback_t = void(T);
 
-private:
+  private:
     std::vector<T> data;
     bool stopped;
 
@@ -23,7 +23,7 @@ private:
     // Threads used by onReceive
     std::vector<std::thread> threads;
 
-public:
+  public:
     PCVector() : stopped(false) {
         sem_init(&full_or_done, 0, 0);
     }
@@ -35,7 +35,7 @@ public:
     }
 
     // Produce item val
-    void push(const T& val) {
+    void push(const T &val) {
         if (stopped)
             throw std::runtime_error("Writing to stopped queue");
         mutex.lock();
@@ -62,7 +62,7 @@ public:
 
     void onReceive(int num_threads, callback_t *callback) {
         for (int i = 0; i < num_threads; i++)
-            threads.emplace_back([] (PCVector<T> &queue, callback_t *callback, int i) {
+            threads.emplace_back([](PCVector<T> &queue, callback_t *callback, int i) {
 #if __linux__
                 // For debugging
                 std::string thread_name = "onReceive#" + std::to_string(i);
@@ -71,7 +71,8 @@ public:
                 while (std::optional<T> item = queue.pop()) {
                     callback(*item);
                 }
-            }, std::ref(*this), callback, i);
+            },
+                                 std::ref(*this), callback, i);
     }
 
     void onReceive(int num_threads, std::function<callback_t> callback) {
@@ -85,7 +86,8 @@ public:
                 while (std::optional<T> item = queue.pop()) {
                     callback(*item);
                 }
-            }, std::ref(*this), i);
+            },
+                                 std::ref(*this), i);
     }
 
     // Signal that there are no more items to be produced

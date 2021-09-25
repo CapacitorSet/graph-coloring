@@ -2,8 +2,6 @@
 
 #define GRAPH_COLORING_SDLSOLVER_H
 
-
-
 #include "Solver.h"
 
 #include <iostream>
@@ -12,9 +10,9 @@
 
 #include <random>
 
-#include <vector>
-#include <thread>
 #include <numeric>
+#include <thread>
+#include <vector>
 
 class SDLSolver : public Solver {
 
@@ -26,15 +24,12 @@ class SDLSolver : public Solver {
 
     void apply_coloring_phase(const std::vector<uint32_t> &degrees, uint32_t vertex, uint32_t range, Graph &graph);
 
-public:
-
+  public:
     SDLSolver(int num_threads);
 
     std::string name() const;
 
     void solve(Graph &);
-
 };
 
 #endif //GRAPH_COLORING_SDLSOLVER_H
-

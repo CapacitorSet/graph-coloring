@@ -18,8 +18,7 @@ void MemoryMonitor::thread_function(MemoryMonitor &monitor) {
 }
 
 // https://stackoverflow.com/a/42925322
-MemoryMonitor::MemoryMonitor() :
-        stopped(false), baseline(current_mem_usage()), peak_usage(0), thread(thread_function, std::ref(*this)) {
+MemoryMonitor::MemoryMonitor() : stopped(false), baseline(current_mem_usage()), peak_usage(0), thread(thread_function, std::ref(*this)) {
 #if __linux__
     // For debugging
     pthread_setname_np(thread.native_handle(), "MemoryMonitor");

@@ -1,8 +1,8 @@
 #ifndef GRAPH_COLORING_SOLVER_H
 #define GRAPH_COLORING_SOLVER_H
 
-#include <string>
 #include "../graph/Graph.h"
+#include <string>
 
 #if WITH_RANDOM_SEED
 #define RANDOM_SEED (std::random_device()())
@@ -13,9 +13,9 @@
 // Define a common solver interface for benchmarking.
 
 class Solver {
-public:
+  public:
     // A virtual dtor allows us to `delete` pointers to Solver (eg. in Benchmark::solvers).
-    virtual ~Solver() {};
+    virtual ~Solver(){};
 
     virtual std::string name() const = 0;
 

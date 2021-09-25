@@ -38,7 +38,7 @@ void JonesSolver::solve(Graph &graph) {
         // Color the current node...
         graph.color_with_smallest(vertex);
         // And update any neighbor that may be "waiting" on it
-        for (uint32_t neighbor: graph.neighbors_of(vertex)) {
+        for (uint32_t neighbor : graph.neighbors_of(vertex)) {
             // If it is no longer waiting on anything, push it to the free vertices queue
             if (rho[vertex] > rho[neighbor] && --waitlist[neighbor] == 0)
                 free_vertices.push(neighbor);

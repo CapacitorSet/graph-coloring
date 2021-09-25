@@ -1,11 +1,11 @@
 #ifndef GRAPH_COLORING_DIMACS10PARSER_H
 #define GRAPH_COLORING_DIMACS10PARSER_H
 
-#include <fstream>
-#include <vector>
-#include <thread>
 #include "../graph/Graph.h"
 #include "../utils/PCVector.h"
+#include <fstream>
+#include <thread>
+#include <vector>
 
 class Dimacs10Parser : public IParser {
     std::ifstream file;
@@ -19,9 +19,7 @@ class Dimacs10Parser : public IParser {
     // Parse a line into a vector of numbers
     static std::vector<uint32_t> parse_numbers(const std::string &line, bool is_header = false);
 
-
-
-public:
+  public:
     Dimacs10Parser(std::ifstream &, const std::string &filename);
 
     Graph parse();

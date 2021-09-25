@@ -1,5 +1,5 @@
-#include <numeric>
 #include "SequentialSolver.h"
+#include <numeric>
 
 SequentialSolver::SequentialSolver() : random_gen(RANDOM_SEED) {}
 

@@ -1,13 +1,13 @@
 #ifndef GRAPH_COLORING_SERIALIZER_H
 #define GRAPH_COLORING_SERIALIZER_H
 
+#include "../graph/Graph.h"
 #include <ostream>
 #include <string>
-#include "../graph/Graph.h"
 
 // Serializes a given graph to a stream (typically a file) for usage with FastParser.
 class Serializer {
-private:
+  private:
     const Graph &graph;
     std::ostream &ostream;
 
@@ -15,7 +15,7 @@ private:
     void serialize(uint32_t vertex);
 
     // Serialize as a length-prefixed vector
-    template<typename T>
+    template <typename T>
     void serialize(std::vector<T> vector) {
         // Length prefix (standardized to u32)
         serialize(static_cast<uint32_t>(vector.size()));
@@ -24,7 +24,7 @@ private:
             serialize(item);
     }
 
-public:
+  public:
     Serializer(const Graph &, std::ostream &);
 };
 

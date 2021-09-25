@@ -1,9 +1,9 @@
 #ifndef GRAPH_COLORING_GRAPH_H
 #define GRAPH_COLORING_GRAPH_H
 
+#include <bitset>
 #include <cstdint>
 #include <vector>
-#include <bitset>
 
 using edges_t = std::vector<uint32_t>;
 using color_t = uint32_t;
@@ -24,14 +24,14 @@ class Graph {
     friend class FVFSolver;
     friend class RandomSelectionSolver;
 
-public:
+  public:
     Graph(std::vector<edges_t> &&_vertices);
 
     bool is_well_colored() const;
     uint32_t count_colors() const;
 
     color_t color_of(uint32_t v) const;
-    const edges_t & neighbors_of(uint32_t v) const;
+    const edges_t &neighbors_of(uint32_t v) const;
     uint32_t degree_of(uint32_t v) const;
 
     // Color vertex v with the smallest color that is not the same as a neighbor's, and return the color
@@ -42,9 +42,9 @@ public:
 };
 
 class DeletableGraph {
-    std::bitset<(1<<24)> deleted; // Note that we support at most 2^24 nodes.
+    std::bitset<(1 << 24)> deleted; // Note that we support at most 2^24 nodes.
 
-public:
+  public:
     const Graph &graph;
 
     DeletableGraph(const Graph &);

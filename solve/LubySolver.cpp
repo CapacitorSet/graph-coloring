@@ -1,8 +1,8 @@
 #include "LubySolver.h"
 
 LubySolver::LubySolver(int num_threads) : num_threads(num_threads), partial_S(num_threads), kill_threads(false), gen(RANDOM_SEED) {
-    pthread_barrier_init(&thread_start_barrier, nullptr, num_threads+1);
-    pthread_barrier_init(&thread_end_barrier, nullptr, num_threads+1);
+    pthread_barrier_init(&thread_start_barrier, nullptr, num_threads + 1);
+    pthread_barrier_init(&thread_end_barrier, nullptr, num_threads + 1);
 }
 
 LubySolver::~LubySolver() {
@@ -41,7 +41,8 @@ void LubySolver::solve(Graph &original_graph) {
                 }
                 pthread_barrier_wait(&thread_end_barrier);
             }
-        }, i, std::cref(original_graph));
+        },
+                             i, std::cref(original_graph));
 
     // Basic structure of MIS-based algorithms: create a MIS, then color it with a new color, and remove it from the graph
     color_t color = 0;

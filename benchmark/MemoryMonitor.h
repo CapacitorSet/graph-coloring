@@ -10,9 +10,9 @@ class MemoryMonitor {
 
     std::thread thread;
 
-    static void thread_function(MemoryMonitor&);
+    static void thread_function(MemoryMonitor &);
 
-public:
+  public:
     MemoryMonitor();
     void stop();
 
@@ -23,6 +23,5 @@ public:
 
     static int64_t current_mem_usage();
 };
-
 
 #endif //GRAPH_COLORING_MEMORYMONITOR_H

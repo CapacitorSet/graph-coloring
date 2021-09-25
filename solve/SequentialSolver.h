@@ -7,13 +7,12 @@
 class SequentialSolver : public Solver {
     std::mt19937 random_gen;
 
-public:
+  public:
     SequentialSolver();
 
     std::string name() const;
 
-    void solve(Graph&);
+    void solve(Graph &);
 };
-
 
 #endif //GRAPH_COLORING_SEQUENTIALSOLVER_H

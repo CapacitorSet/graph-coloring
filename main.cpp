@@ -1,10 +1,10 @@
+#include "benchmark/Benchmark.h"
+#include "parse/Parser.h"
 #include <algorithm>
 #include <iostream>
-#include "parse/Parser.h"
-#include "benchmark/Benchmark.h"
 
 int main(int argc, char **argv) {
-    std::vector<std::string> args(argv, argv+argc);
+    std::vector<std::string> args(argv, argv + argc);
     if (args.size() < 2) {
         std::cerr << "Syntax: " << args[0] << " [--parse-only] [--csv] <graph>" << std::endl;
         return 1;
@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
     if (use_csv) {
         if (parse_only) {
             std::cout << p.metadata.filename << ";" << std::to_string(p.metadata.num_vertices) << ";"
-                << std::to_string(p.metadata.num_edges) << ";";
+                      << std::to_string(p.metadata.num_edges) << ";";
             std::cout << std::to_string(long(p.milliseconds)) << std::endl;
         }
     } else {

@@ -1,10 +1,10 @@
 #ifndef GRAPH_COLORING_DIMACSPARSER_H
 #define GRAPH_COLORING_DIMACSPARSER_H
 
-#include <fstream>
-#include <vector>
 #include "../graph/Graph.h"
 #include "Parser.h"
+#include <fstream>
+#include <vector>
 
 class DimacsParser : public IParser {
     std::ifstream file;
@@ -20,7 +20,7 @@ class DimacsParser : public IParser {
     // Merge the adjacency lists
     std::vector<edges_t> merge_adj_lists(const std::vector<edges_t> &lists);
 
-public:
+  public:
     DimacsParser(std::ifstream &, const std::string &filename);
 
     Graph parse();

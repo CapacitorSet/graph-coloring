@@ -21,7 +21,6 @@ void LDFSolver::solve(Graph &graph) {
 
             /* Applying the coloring phase where coloring is done in order according to the assigned weights */
             coloring_in_parallel(from, to, graph);
-
         }));
 
     for (auto &th : threads) {
@@ -59,4 +58,3 @@ void LDFSolver::coloring_in_parallel(uint32_t from, uint32_t to, Graph &graph) {
 std::string LDFSolver::name() const {
     return "LDFSolver (" + std::to_string(num_threads) + " threads)";
 }
-

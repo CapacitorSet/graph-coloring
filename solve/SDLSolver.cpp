@@ -28,9 +28,7 @@ void SDLSolver::solve(Graph &graph) {
 
             /* Applying the coloring phase where coloring is done in order according to the assigned weights */
             apply_coloring_phase(degrees, from, to, graph);
-
         }));
-
     }
 
     for (auto &th : threads) {
@@ -60,7 +58,7 @@ void SDLSolver::apply_weighting_phase(const Graph &graph, std::vector<uint32_t> 
 
     /* Keep working till the globalDegree reached the max degree */
     while (CurrentDegree <= max_degree) {
-        for (uint32_t vertexID = from; vertexID < to; vertexID++)  {
+        for (uint32_t vertexID = from; vertexID < to; vertexID++) {
             if (degrees[vertexID] <= CurrentDegree && degrees[vertexID] >= 0) {
                 weights[vertexID] = CurrentWeight;
                 degrees[vertexID] = -1;

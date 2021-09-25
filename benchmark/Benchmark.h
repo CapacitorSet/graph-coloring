@@ -19,16 +19,17 @@ class Benchmark {
     // Return the number of milliseconds when using the given solver
     struct result run_single(Solver *);
 
-public:
+  public:
     Benchmark(Graph &);
 
     void run();
 
     struct {
-        enum {USE_TEXT, USE_CSV, USE_CSV_COMPACT} output;
+        enum { USE_TEXT,
+               USE_CSV,
+               USE_CSV_COMPACT } output;
         Parser::metadata_t *parse_md;
     } settings;
 };
-
 
 #endif //GRAPH_COLORING_BENCHMARK_H

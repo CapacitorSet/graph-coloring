@@ -1,14 +1,14 @@
+#include "DimacsParser.h"
+#include "../utils/PCVector.h"
+#include "../utils/RangeSplitter.h"
+#include "Parser.h"
 #include <algorithm>
 #include <cmath>
 #include <sstream>
 #include <thread>
-#include "../utils/PCVector.h"
-#include "Parser.h"
-#include "DimacsParser.h"
-#include "../utils/RangeSplitter.h"
 
 DimacsParser::DimacsParser(std::ifstream &_file, const std::string &filename)
-        : file(std::move(_file)), fastparse_file(filename + ".fast"), num_threads(2) {
+    : file(std::move(_file)), fastparse_file(filename + ".fast"), num_threads(2) {
     if (!fastparse_file.is_open())
         throw std::runtime_error("Failed to open fastparse file for writing!");
 }
@@ -60,9 +60,10 @@ std::vector<edges_t> DimacsParser::parse_lines() {
     } else {
         using index_line_t = std::pair<std::vector<edges_t>::iterator, std::string>;
         PCVector<index_line_t> line_queue;
-        line_queue.onReceive(num_threads, (void (*)(index_line_t)) [](index_line_t pair) {
-            *pair.first = parse_numbers(pair.second);
-        });
+        line_queue.onReceive(
+            num_threads, (void (*)(index_line_t))[](index_line_t pair) {
+                *pair.first = parse_numbers(pair.second);
+            });
         std::string line;
         for (uint32_t i = 0; i < num_vertices; i++) {
             std::getline(file, line);

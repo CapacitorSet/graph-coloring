@@ -1,8 +1,8 @@
 #include "RandomSelectionSolver.h"
 #include "../utils/RangeSplitter.h"
 #include <numeric>
-#include <thread>
 #include <random>
+#include <thread>
 
 RandomSelectionSolver::RandomSelectionSolver(int num_threads) : num_threads(num_threads) {}
 
