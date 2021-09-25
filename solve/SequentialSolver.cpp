@@ -1,16 +1,12 @@
 #include <numeric>
-#include <algorithm>
-#include <random>
-#include <set>
 #include "SequentialSolver.h"
 
-void SequentialSolver::solve(Graph &graph) {
-    std::mt19937 random_gen(RANDOM_SEED);
+SequentialSolver::SequentialSolver() : random_gen(RANDOM_SEED) {}
 
+void SequentialSolver::solve(Graph &graph) {
     // Create a random permutation of {v_0, v_1... v_n}
     std::vector<uint32_t> permutation(graph.vertices.size());
-    // std::iota begins from 1, so begin() + 1 ensures that we start from 0
-    std::iota(permutation.begin() + 1, permutation.end(), 1);
+    std::iota(permutation.begin(), permutation.end(), 0);
     std::shuffle(permutation.begin(), permutation.end(), random_gen);
 
     // For each vertex...

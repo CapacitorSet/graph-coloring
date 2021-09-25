@@ -2,10 +2,13 @@
 #define GRAPH_COLORING_SEQUENTIALSOLVER_H
 
 #include "Solver.h"
+#include <random>
 
 class SequentialSolver : public Solver {
+    std::mt19937 random_gen;
+
 public:
-    SequentialSolver() = default;
+    SequentialSolver();
 
     std::string name() const;
 
