@@ -16,9 +16,9 @@ int main(int argc, char **argv) {
     Graph graph = p.parse();
     if (use_csv) {
         if (parse_only) {
-            std::cout << p.metadata.filename << ";" << std::to_string(p.metadata.num_vertices) << ";"
-                      << std::to_string(p.metadata.num_edges) << ";";
-            std::cout << std::to_string(long(p.milliseconds)) << std::endl;
+            std::cout << p.metadata.filename << "," << std::to_string(p.metadata.num_vertices) << ","
+                      << std::to_string(p.metadata.num_edges) << ","
+                      << std::to_string(long(p.milliseconds)) << std::endl;
         }
     } else {
         std::cout << "Parsed in " << std::to_string(long(p.milliseconds)) << " ms." << std::endl;
