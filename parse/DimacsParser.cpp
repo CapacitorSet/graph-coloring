@@ -22,11 +22,11 @@ Graph DimacsParser::parse() {
     num_vertices = std::stoul(header);
 
     // Contains the adjacency lists parsed from the file
-    std::vector<edges_t> vertices = parse_lines();
+    std::vector<adjacency_vec_t> vertices = parse_lines();
     // A new vector where to merge vertices, so as not to risk creating the same edges twice
-    std::vector<edges_t> merged_vertices = merge_adj_lists(vertices);
+    std::vector<adjacency_vec_t> merged_vertices = merge_adj_lists(vertices);
 
-    return Graph(std::move(merged_vertices));
+    return Graph(merged_vertices);
 }
 
 std::vector<uint32_t> DimacsParser::parse_numbers(const std::string &line) {
@@ -46,9 +46,9 @@ std::vector<uint32_t> DimacsParser::parse_numbers(const std::string &line) {
     return ret;
 }
 
-std::vector<edges_t> DimacsParser::parse_lines() {
+std::vector<adjacency_vec_t> DimacsParser::parse_lines() {
     // Contains the adjacency lists parsed from the file
-    std::vector<edges_t> vertices(num_vertices);
+    std::vector<adjacency_vec_t> vertices(num_vertices);
 
     // Empirically, the single-thread version performs better by ~30%.
     if (num_threads == 1) {
@@ -58,7 +58,7 @@ std::vector<edges_t> DimacsParser::parse_lines() {
             vertices[i] = parse_numbers(line);
         }
     } else {
-        using index_line_t = std::pair<std::vector<edges_t>::iterator, std::string>;
+        using index_line_t = std::pair<std::vector<adjacency_vec_t>::iterator, std::string>;
         PCVector<index_line_t> line_queue;
         line_queue.onReceive(
             num_threads, (void (*)(index_line_t))[](index_line_t pair) {
@@ -75,8 +75,8 @@ std::vector<edges_t> DimacsParser::parse_lines() {
     return vertices;
 }
 
-std::vector<edges_t> DimacsParser::merge_adj_lists(const std::vector<edges_t> &vertices) {
-    std::vector<edges_t> merged_vertices(vertices);
+std::vector<adjacency_vec_t> DimacsParser::merge_adj_lists(const std::vector<adjacency_vec_t> &vertices) {
+    std::vector<adjacency_vec_t> merged_vertices(vertices);
 
     // Because DIMACS-10 only includes edges once (eg. 1->2 and not 2->1), we must merge the adjacency lists.
     // To do so in parallel, each thread can only write to a range of 1/N elements.
@@ -99,7 +99,7 @@ std::vector<edges_t> DimacsParser::merge_adj_lists(const std::vector<edges_t> &v
 
             // Sorted vectors allow for efficient algorithms like std::set_intersection
             for (int pos = range_lower; pos < range_higher; pos++) {
-                edges_t &edges = merged_vertices[pos];
+                adjacency_vec_t &edges = merged_vertices[pos];
                 std::sort(edges.begin(), edges.end());
             }
         });

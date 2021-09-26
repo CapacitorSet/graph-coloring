@@ -16,9 +16,9 @@ class DimacsParser : public IParser {
     static std::vector<uint32_t> parse_numbers(const std::string &line);
 
     // Parse the adjacency lists, but do not merge them
-    std::vector<edges_t> parse_lines();
+    std::vector<adjacency_vec_t> parse_lines();
     // Merge the adjacency lists
-    std::vector<edges_t> merge_adj_lists(const std::vector<edges_t> &lists);
+    std::vector<adjacency_vec_t> merge_adj_lists(const std::vector<adjacency_vec_t> &lists);
 
   public:
     DimacsParser(std::ifstream &, const std::string &filename);

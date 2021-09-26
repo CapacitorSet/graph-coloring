@@ -24,6 +24,15 @@ class Serializer {
             serialize(item);
     }
 
+    template <typename T>
+    void serialize(nonstd::span<T> vector) {
+        // Length prefix (standardized to u32)
+        serialize(static_cast<uint32_t>(vector.size()));
+        // Then serialize each member (possibly recursively, eg. if we have a vector of adjacency lists)
+        for (const T &item : vector)
+            serialize(item);
+    }
+
   public:
     Serializer(const Graph &, std::ostream &);
 };

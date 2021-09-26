@@ -1,7 +1,7 @@
 #include "Serializer.h"
 
 Serializer::Serializer(const Graph &graph, std::ostream &ostream) : graph(graph), ostream(ostream) {
-    serialize(graph.vertices);
+    serialize(graph.neighbor_indices);
     // Ensure that the fastparse graph was written, so that crashes do not result in a malformed file
     ostream.flush();
 }

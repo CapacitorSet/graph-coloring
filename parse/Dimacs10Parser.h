@@ -2,6 +2,7 @@
 #define GRAPH_COLORING_DIMACS10PARSER_H
 
 #include "../graph/Graph.h"
+#include "Parser.h"
 #include "../utils/PCVector.h"
 #include <fstream>
 #include <thread>
@@ -11,7 +12,7 @@ class Dimacs10Parser : public IParser {
     std::ifstream file;
     std::ofstream fastparse_file;
 
-    using position_t = std::vector<edges_t>::iterator;
+    using position_t = std::vector<adjacency_vec_t>::iterator;
     // Store the string to be parsed and the position where to put it
     using message_t = std::pair<std::string, position_t>;
     PCVector<message_t> queue;

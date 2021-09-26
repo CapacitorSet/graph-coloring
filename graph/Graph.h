@@ -1,15 +1,21 @@
 #ifndef GRAPH_COLORING_GRAPH_H
 #define GRAPH_COLORING_GRAPH_H
 
+#include "../utils/span-lite.hpp"
 #include <bitset>
 #include <cstdint>
 #include <vector>
 
-using edges_t = std::vector<uint32_t>;
+using adjacency_vec_t = std::vector<uint32_t>;
+using adjacency_list_t = nonstd::span<uint32_t>;
 using color_t = uint32_t;
 
+/* Graph implements the CSR data structure: we have a vector `neighbors` which holds all vertices' neighbors in sequence,
+ * and a vector `neighbor_indices` which for each vertex points to the range in `vertices` where its neighbors lie.
+ */
 class Graph {
-    std::vector<edges_t> vertices;
+    std::vector<uint32_t> neighbors;
+    std::vector<adjacency_list_t> neighbor_indices;
     std::vector<color_t> colors;
 
     friend class DeletableGraph;
@@ -25,13 +31,14 @@ class Graph {
     friend class RandomSelectionSolver;
 
   public:
-    Graph(std::vector<edges_t> &&_vertices);
+    Graph(const std::vector<adjacency_vec_t> &adj_list);
 
     bool is_well_colored() const;
     uint32_t count_colors() const;
 
+    uint32_t num_vertices() const;
     color_t color_of(uint32_t v) const;
-    const edges_t &neighbors_of(uint32_t v) const;
+    adjacency_list_t neighbors_of(uint32_t v) const;
     uint32_t degree_of(uint32_t v) const;
 
     // Color vertex v with the smallest color that is not the same as a neighbor's, and return the color

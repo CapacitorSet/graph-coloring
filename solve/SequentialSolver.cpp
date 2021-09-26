@@ -5,7 +5,7 @@ SequentialSolver::SequentialSolver() : random_gen(RANDOM_SEED) {}
 
 void SequentialSolver::solve(Graph &graph) {
     // Create a random permutation of {v_0, v_1... v_n}
-    std::vector<uint32_t> permutation(graph.vertices.size());
+    std::vector<uint32_t> permutation(graph.num_vertices());
     std::iota(permutation.begin(), permutation.end(), 0);
     std::shuffle(permutation.begin(), permutation.end(), random_gen);
 

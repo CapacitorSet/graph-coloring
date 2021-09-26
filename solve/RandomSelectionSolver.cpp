@@ -1,10 +1,9 @@
 #include "RandomSelectionSolver.h"
 #include "../utils/RangeSplitter.h"
 #include <numeric>
-#include <random>
 #include <thread>
 
-RandomSelectionSolver::RandomSelectionSolver(int num_threads) : num_threads(num_threads) {}
+RandomSelectionSolver::RandomSelectionSolver(int num_threads) : num_threads(num_threads), random_gen(RANDOM_SEED) {}
 
 void RandomSelectionSolver::solve(Graph &graph) {
     /* if a number of threads larger than the ability of the system, generate error */
@@ -13,7 +12,7 @@ void RandomSelectionSolver::solve(Graph &graph) {
                                  std::to_string(std::thread::hardware_concurrency()) + " threads");
 
     /* Each thread has a vertex to start from and a range of vertices to work on */
-    RangeSplitter rs(graph.vertices.size(), num_threads);
+    RangeSplitter rs(graph.num_vertices(), num_threads);
 
     std::vector<std::thread> threads;
 
@@ -35,9 +34,6 @@ void RandomSelectionSolver::solve(Graph &graph) {
 }
 
 void RandomSelectionSolver::coloring_in_parallel(uint32_t from, uint32_t to, Graph &graph) {
-
-    std::mt19937 random_gen(RANDOM_SEED);
-
     std::vector<uint32_t> random_order(to - from);
 
     std::iota(random_order.begin(), random_order.end(), from);
@@ -46,7 +42,7 @@ void RandomSelectionSolver::coloring_in_parallel(uint32_t from, uint32_t to, Gra
     /* start coloring according to the order assigned above where no two neighbors have the same color */
     for (const auto &vertex_to_color : random_order) {
         uint32_t my_color = graph.color_with_smallest(vertex_to_color);
-        for (const auto &neighbor : graph.vertices[vertex_to_color]) {
+        for (const auto &neighbor : graph.neighbors_of(vertex_to_color)) {
             if (my_color == graph.colors[neighbor]) {
                 wrong_ones.emplace_back(vertex_to_color);
                 break;

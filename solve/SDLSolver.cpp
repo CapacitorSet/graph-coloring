@@ -5,7 +5,7 @@ SDLSolver::SDLSolver(int num_threads) : num_threads(num_threads) {}
 
 void SDLSolver::solve(Graph &graph) {
 
-    uint32_t num_vertices = graph.vertices.size();
+    uint32_t num_vertices = graph.num_vertices();
 
     std::vector<uint32_t> degrees(num_vertices, 0);
     std::vector<uint32_t> weights(num_vertices, 0);
@@ -89,8 +89,8 @@ void SDLSolver::apply_coloring_phase(const std::vector<uint32_t> &weights, uint3
     /* start coloring according to the order assigned above where no two neighbors have the same color */
     for (const auto &vertex_to_color : vertices_to_color) {
         uint32_t my_color = graph.color_with_smallest(vertex_to_color);
-        for (const auto &neighbor : graph.vertices[vertex_to_color]) {
-            if (my_color == graph.colors[neighbor]) {
+        for (const auto &neighbor : graph.neighbors_of(vertex_to_color)) {
+            if (my_color == graph.color_of(neighbor)) {
                 wrong_ones.emplace_back(vertex_to_color);
                 break;
             }
