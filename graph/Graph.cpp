@@ -7,7 +7,7 @@
 Graph::Graph(const std::vector<std::vector<uint32_t>> &adj_list) : colors(adj_list.size()), neighbor_indices(adj_list.size()) {
     for (size_t idx = 0; idx < adj_list.size(); idx++) {
         const auto &list = adj_list[idx];
-        auto begin_it = neighbors.insert(neighbors.end(), list.begin(),  list.end());
+        auto begin_it = neighbors.insert(neighbors.end(), list.begin(), list.end());
         // neighbor_indices[idx] = nonstd::span<uint32_t>(begin_it, list.size());
     }
     auto begin_it = neighbors.begin();

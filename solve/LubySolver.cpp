@@ -1,7 +1,7 @@
 #include "LubySolver.h"
 
 LubySolver::LubySolver(int num_threads) : num_threads(num_threads), partial_S(num_threads), kill_threads(false),
-    V_splitter(nullptr), gen(RANDOM_SEED) {
+                                          V_splitter(nullptr), gen(RANDOM_SEED) {
     pthread_barrier_init(&thread_start_barrier, nullptr, num_threads + 1);
     pthread_barrier_init(&thread_end_barrier, nullptr, num_threads + 1);
 }

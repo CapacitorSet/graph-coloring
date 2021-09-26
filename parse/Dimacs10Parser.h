@@ -2,8 +2,8 @@
 #define GRAPH_COLORING_DIMACS10PARSER_H
 
 #include "../graph/Graph.h"
-#include "Parser.h"
 #include "../utils/PCVector.h"
+#include "Parser.h"
 #include <fstream>
 #include <thread>
 #include <vector>

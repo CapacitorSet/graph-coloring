@@ -2,9 +2,8 @@
 
 #define GRAPH_COLORING_SDLSOLVER_H
 
-#include "Solver.h"
 #include "../graph/Graph.h"
-
+#include "Solver.h"
 
 #include <iostream>
 
