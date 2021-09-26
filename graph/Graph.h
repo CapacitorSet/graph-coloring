@@ -22,13 +22,8 @@ class Graph {
     friend class Serializer;
     friend class Parser;
 
-    friend class SequentialSolver;
+    // MIS-based solvers color vertices directly rather than via color_with_smallest
     friend class LubySolver;
-    friend class JonesSolver;
-    friend class LDFSolver;
-    friend class SDLSolver;
-    friend class FVFSolver;
-    friend class RandomSelectionSolver;
 
   public:
     Graph(const std::vector<adjacency_vec_t> &adj_list);

@@ -43,7 +43,7 @@ void RandomSelectionSolver::coloring_in_parallel(uint32_t from, uint32_t to, Gra
     for (const auto &vertex_to_color : random_order) {
         uint32_t my_color = graph.color_with_smallest(vertex_to_color);
         for (const auto &neighbor : graph.neighbors_of(vertex_to_color)) {
-            if (my_color == graph.colors[neighbor]) {
+            if (my_color == graph.color_of(neighbor)) {
                 wrong_ones.emplace_back(vertex_to_color);
                 break;
             }
