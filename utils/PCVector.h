@@ -4,8 +4,11 @@
 #include <functional>
 #include <mutex>
 #include <optional>
-#include <semaphore.h>
+#include <thread>
 #include <vector>
+#if __linux__
+#include <pthread.h>
+#endif
 
 // A vector that implements the producer-consumer pattern.
 template <typename T>
