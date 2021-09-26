@@ -32,7 +32,7 @@ Graph Dimacs10Parser::parse() {
             *message.second = parse_numbers(message.first);
         });
 
-    std::vector<edges_t> vertices(numVertices);
+    std::vector<adjacency_vec_t> vertices(numVertices);
     std::string line;
     for (uint32_t i = 0; i < numVertices; i++) {
         std::getline(file, line);

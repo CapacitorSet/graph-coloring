@@ -40,8 +40,8 @@ Graph Parser::parse() {
     Graph g = parser->parse();
     auto t2 = std::chrono::high_resolution_clock::now();
     milliseconds = std::chrono::duration<double, std::milli>(t2 - t1).count();
-    metadata.num_vertices = g.vertices.size();
-    for (const auto &neighbors : g.vertices)
+    metadata.num_vertices = g.num_vertices();
+    for (const auto &neighbors : g.neighbor_indices)
         metadata.num_edges += neighbors.size();
     // If we're not using FastParser, serialize the graph to a .fast file
     if (serializable) {

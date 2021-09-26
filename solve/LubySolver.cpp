@@ -1,6 +1,7 @@
 #include "LubySolver.h"
 
-LubySolver::LubySolver(int num_threads) : num_threads(num_threads), partial_S(num_threads), kill_threads(false), gen(RANDOM_SEED) {
+LubySolver::LubySolver(int num_threads) : num_threads(num_threads), partial_S(num_threads), kill_threads(false),
+    V_splitter(nullptr), gen(RANDOM_SEED) {
     pthread_barrier_init(&thread_start_barrier, nullptr, num_threads + 1);
     pthread_barrier_init(&thread_end_barrier, nullptr, num_threads + 1);
 }
@@ -69,9 +70,8 @@ void LubySolver::compute_MIS(const DeletableGraph &del_graph) {
     V.clear();
 
     const Graph &graph = del_graph.graph;
-    uint32_t num_vertices = graph.vertices.size();
 
-    for (uint32_t i = 0; i < num_vertices; i++)
+    for (uint32_t i = 0; i < graph.num_vertices(); i++)
         // It suffices to check for is_deleted here, since we don't delete vertices inside the function
         if (!del_graph.is_deleted(i))
             V.emplace(i);
@@ -98,12 +98,13 @@ void LubySolver::probabilistic_select(const Graph &graph) {
     // Reset solver state
     S.clear();
     S_bitmap.clear();
-    S_bitmap.resize(graph.vertices.size());
+    S_bitmap.resize(graph.num_vertices());
     for (auto &S_ : partial_S)
         S_.clear();
     // Mirror V into a temporary vector
     V_vec = std::move(std::vector<uint32_t>(V.cbegin(), V.cend()));
-    delete V_splitter;
+    if (V_splitter != nullptr)
+        delete V_splitter;
     V_splitter = new VectorSplitter(V_vec, num_threads);
 
     // Start all threads...
@@ -130,8 +131,8 @@ void LubySolver::remove_edges(const Graph &g) {
          *
          * However, since neighbors are sorted we can start searching in the middle of the array, after the smaller vertices.
          */
-        auto &neighbors = g.neighbors_of(from);
-        for (auto pos = std::lower_bound(neighbors.cbegin(), neighbors.cend(), from); pos != neighbors.cend(); ++pos) {
+        auto neighbors = g.neighbors_of(from);
+        for (auto pos = std::lower_bound(neighbors.begin(), neighbors.end(), from); pos != neighbors.end(); ++pos) {
             uint32_t to = *pos;
             if (!S_bitmap[to])
                 continue;

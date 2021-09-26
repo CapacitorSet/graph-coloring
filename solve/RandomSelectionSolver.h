@@ -2,9 +2,11 @@
 #define GRAPH_COLORING_RANDOMSELECTIONSOLVER_H
 
 #include "Solver.h"
+#include <random>
 
 class RandomSelectionSolver : public Solver {
     uint32_t num_threads;
+    std::mt19937 random_gen;
 
     std::vector<uint32_t> wrong_ones;
 

@@ -4,16 +4,28 @@
 #include <set>
 #include <unordered_set>
 
-Graph::Graph(std::vector<edges_t> &&_vertices) : vertices(std::move(_vertices)), colors(vertices.size()) {}
+Graph::Graph(const std::vector<std::vector<uint32_t>> &adj_list) : colors(adj_list.size()), neighbor_indices(adj_list.size()) {
+    for (size_t idx = 0; idx < adj_list.size(); idx++) {
+        const auto &list = adj_list[idx];
+        auto begin_it = neighbors.insert(neighbors.end(), list.begin(),  list.end());
+        // neighbor_indices[idx] = nonstd::span<uint32_t>(begin_it, list.size());
+    }
+    auto begin_it = neighbors.begin();
+    for (size_t idx = 0; idx < adj_list.size(); idx++) {
+        const auto &list = adj_list[idx];
+        auto end_it = begin_it + list.size();
+        neighbor_indices[idx] = nonstd::span<uint32_t>(begin_it, end_it);
+        begin_it = end_it;
+    }
+}
 
 bool Graph::is_well_colored() const {
     // For all vertices...
-    for (size_t idx = 0; idx < vertices.size(); idx++) {
-        edges_t edges = vertices[idx];
-        color_t from_color = colors[idx];
+    for (size_t idx = 0; idx < neighbor_indices.size(); idx++) {
+        color_t from_color = color_of(idx);
         // For all edges...
-        for (const uint32_t &to_idx : edges) {
-            color_t to_color = colors[to_idx];
+        for (const uint32_t &to_idx : neighbors_of(idx)) {
+            color_t to_color = color_of(to_idx);
             // Check that the color matches
             if (from_color == to_color)
                 return false;
@@ -27,12 +39,16 @@ uint32_t Graph::count_colors() const {
     return std::unordered_set<color_t>(this->colors.cbegin(), this->colors.cend()).size();
 }
 
+uint32_t Graph::num_vertices() const {
+    return neighbor_indices.size();
+}
+
 color_t Graph::color_of(uint32_t v) const {
     return colors[v];
 }
 
-const edges_t &Graph::neighbors_of(uint32_t v) const {
-    return vertices[v];
+adjacency_list_t Graph::neighbors_of(uint32_t v) const {
+    return neighbor_indices[v];
 }
 
 uint32_t Graph::degree_of(uint32_t v) const {
@@ -90,7 +106,7 @@ bool DeletableGraph::is_deleted(uint32_t v) const {
 }
 
 bool DeletableGraph::empty() const {
-    return graph.vertices.size() == deleted.count();
+    return graph.num_vertices() == deleted.count();
 }
 
 void DeletableGraph::clear() {

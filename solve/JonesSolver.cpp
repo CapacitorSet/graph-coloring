@@ -7,18 +7,18 @@ std::string JonesSolver::name() const {
 }
 
 void JonesSolver::solve(Graph &graph) {
-    std::vector<uint32_t> rho(graph.vertices.size());
+    std::vector<uint32_t> rho(graph.num_vertices());
     // In Jones' paper, "choose rho(v)" = generate a different random number for each vertex
     std::iota(rho.begin() + 1, rho.end(), 1);
     std::shuffle(rho.begin(), rho.end(), gen);
 
     PCVector<uint32_t> free_vertices;
-    std::atomic<uint32_t> num_vertices_uncolored = graph.vertices.size();
+    std::atomic<uint32_t> num_vertices_uncolored = graph.num_vertices();
 
     // Associates each vertex with the number of neighbors it is "waiting on" (uncolored with higher rho)
-    std::vector<std::atomic<int>> waitlist(graph.vertices.size());
-    for (uint32_t vertex = 0; vertex < graph.vertices.size(); ++vertex) {
-        const edges_t &neighbors = graph.neighbors_of(vertex);
+    std::vector<std::atomic<int>> waitlist(graph.num_vertices());
+    for (uint32_t vertex = 0; vertex < graph.num_vertices(); ++vertex) {
+        const auto &neighbors = graph.neighbors_of(vertex);
         auto rho_current = rho[vertex];
         int num_wait = 0;
         for (const auto neighbor : graph.neighbors_of(vertex))
