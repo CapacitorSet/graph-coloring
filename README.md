@@ -19,5 +19,7 @@ cd ..
 ## Run
 
 ```
-build/graph_coloring path_to_graph.gra
+build/graph_coloring [--csv] [--parse-only] path_to_graph
 ```
+
+The flag `--csv` enables CSV output; `--parse-only` quits after the parsing stage.
